@@ -1,30 +1,54 @@
 <!DOCTYPE html>
-<!-- Force dark class as the default initial server-side/load state -->
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Attendance & Performance Tracker</title>
-    <!-- Tailwind CSS with custom configuration to enable class-based dark mode -->
+    <title>OpsTracker - Absenteeism & Leave Manager</title>
+    
+    <!-- Tailwind CSS with custom configuration for class-based dark mode -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class'
         }
     </script>
+    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- SheetJS for Excel Export & jsPDF for PDF generation -->
+    
+    <!-- Excel & PDF Export Tools -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- FullCalendar CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-    <!-- FIREBASE SERVICES CORE CONFIGURATION -->
+    <!-- Style overrides for FullCalendar theme matching -->
+    <style>
+        .fc {
+            --fc-border-color: #374151;
+            --fc-page-bg-color: transparent;
+        }
+        .dark .fc-theme-standard td, .dark .fc-theme-standard th {
+            border-color: #374151;
+        }
+        .dark .fc-col-header-cell {
+            background-color: #1f2937;
+            color: #f3f4f6;
+        }
+        .fc-event {
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+    </style>
+
+    <!-- FIREBASE MODULE SYSTEM -->
     <script type="module">
-        // Import Firebase App Core and Firestore Database SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDmnYLrkActmDa0Y2WIvy2qdASvi1glMHM",
             authDomain: "vbabsenteeism.firebaseapp.com",
@@ -34,18 +58,20 @@
             appId: "1:994740092536:web:4d566a6139dcea2505378d"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Expose database utilities globally so our HTML interface forms can call them directly
+        // Expose database elements globally
         window.db = db;
         window.firestoreUtils = { collection, addDoc, getDocs, query, orderBy };
+        
+        // Trigger initial data load once DB is loaded
+        window.dispatchEvent(new Event('firebase-initialized'));
     </script>
 </head>
 <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
 
-    <div class="flex h-screen">
+    <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
         <aside class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-between">
             <div>
@@ -54,27 +80,25 @@
                         <i data-lucide="shield-alert" class="text-emerald-600 dark:text-emerald-400 w-8 h-8"></i>
                         <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">OpsTracker</h1>
                     </div>
-                    
-                    <!-- DYNAMIC THEME TOGGLE BUTTON -->
                     <button onclick="toggleTheme()" class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition" title="Toggle Display Mode">
                         <i id="theme-icon" data-lucide="sun" class="w-4 h-4"></i>
                     </button>
                 </div>
                 <nav class="space-y-2">
-                    <a href="#dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition">
+                    <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition" id="btn-dashboard">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                    </a>
-                    <a href="#calendar" onclick="switchTab('calendar')" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition">
+                    </button>
+                    <button onclick="switchTab('calendar')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition" id="btn-calendar">
                         <i data-lucide="calendar" class="w-5 h-5"></i> Team Calendar
-                    </a>
-                    <a href="#roster" onclick="switchTab('roster')" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition">
-                        <i data-lucide="users" class="w-5 h-5"></i> Roster & Profiles
-                    </a>
+                    </button>
+                    <button onclick="switchTab('roster')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition" id="btn-roster">
+                        <i data-lucide="users" class="w-5 h-5"></i> Team Directory
+                    </button>
                 </nav>
             </div>
             
             <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                <button onclick="openModal('logActionModal')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-sm">
+                <button onclick="openModal('logActionModal')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition text-sm">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i> Log Leave / Note
                 </button>
             </div>
@@ -83,170 +107,533 @@
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto p-8">
             
-            <!-- SECTION 1: MAIN DASHBOARD -->
+            <!-- SECTION 1: DASHBOARD -->
             <section id="dashboard-view" class="space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Operations Overview</h2>
-                        <p class="text-gray-500 dark:text-gray-400 text-sm">Real-time team presence and pattern tracking.</p>
-                    </div>
-                    <div class="text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400">
-                        Shift Window: <span class="text-gray-900 dark:text-white font-medium">Live Roster</span>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Real-time attendance logs and action triggers.</p>
                     </div>
                 </div>
 
-                <!-- Metrics Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Daily Attendance</p>
-                            <h3 class="text-3xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">94.2%</h3>
-                        </div>
-                        <i data-lucide="user-check" class="text-gray-400 dark:text-gray-500 w-8 h-8"></i>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Unplanned Sickness Events</p>
+                        <h3 id="stat-absences" class="text-3xl font-bold mt-1 text-red-600 dark:text-red-400">0</h3>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Unplanned Absences</p>
-                            <h3 class="text-3xl font-bold mt-1 text-red-600 dark:text-red-400">2</h3>
-                        </div>
-                        <i data-lucide="user-x" class="text-gray-400 dark:text-gray-500 w-8 h-8"></i>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Approved Annual Leave Blocks</p>
+                        <h3 id="stat-leave" class="text-3xl font-bold mt-1 text-blue-600 dark:text-blue-400">0</h3>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Approved Leave</p>
-                            <h3 class="text-3xl font-bold mt-1 text-blue-600 dark:text-blue-400">4</h3>
-                        </div>
-                        <i data-lucide="palm-tree" class="text-gray-400 dark:text-gray-500 w-8 h-8"></i>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">High Bradford Flag</p>
-                            <h3 class="text-3xl font-bold mt-1 text-amber-600 dark:text-amber-400">1</h3>
-                        </div>
-                        <i data-lucide="alert-triangle" class="text-gray-400 dark:text-gray-500 w-8 h-8"></i>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Official File Notes Logged</p>
+                        <h3 id="stat-notes" class="text-3xl font-bold mt-1 text-amber-600 dark:text-amber-400">0</h3>
                     </div>
                 </div>
 
-                <!-- Tables and Lists Grid Split -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                        <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Exceptions & Activity</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs uppercase bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                    <tr>
-                                        <th class="px-4 py-3">Employee</th>
-                                        <th class="px-4 py-3">Type</th>
-                                        <th class="px-4 py-3">Date Range</th>
-                                        <th class="px-4 py-3">Status/Reason</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-750 cursor-pointer" onclick="viewIndividualReport('emp_001')">
-                                        <td class="px-4 py-3 text-gray-900 dark:text-white font-medium">Emil Tyson</td>
-                                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700 text-xs">Absent</span></td>
-                                        <td class="px-4 py-3">Jul 14 - Jul 15</td>
-                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">Unplanned Sick (No Cert)</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Tables Split Panel -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                    <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Exceptions Log</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs uppercase bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                <tr>
+                                    <th class="px-4 py-3">Employee</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3">Date Range</th>
+                                    <th class="px-4 py-3">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Loaded dynamically -->
+                                <tr>
+                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with Firestore database...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: DYNAMIC CALENDAR -->
+            <section id="calendar-view" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Attendance Calendar</h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Visual monthly and weekly event mapping.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                    <div id="calendar-element"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: TEAM DIRECTORY / PROFILES -->
+            <section id="roster-view" class="space-y-6 hidden">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Team Directory</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Select an employee to see their individual breakdown, Bradford score, or export data.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- SECTION 4: INDIVIDUAL BREAKDOWN REPORT -->
+            <section id="individual-view" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <button onclick="switchTab('roster')" class="p-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 dark:text-gray-400 transition">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <div>
+                            <h2 id="report-name" class="text-2xl font-bold text-gray-900 dark:text-white">Employee Name</h2>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">Individual Attendance Record & Analytics</p>
                         </div>
                     </div>
+                    <div class="flex gap-3">
+                        <button onclick="exportToExcel()" class="bg-gray-100 dark:bg-gray-850 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium">
+                            <i data-lucide="download" class="w-4 h-4"></i> Export Excel
+                        </button>
+                        <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Generate PDF Breakdown
+                        </button>
+                    </div>
+                </div>
 
-                    <div class="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                        <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Bradford Factor Watchlist</h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Emil Tyson</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">4 spells this quarter</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="px-2.5 py-1 rounded bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 font-bold text-xs">Score: 128</span>
-                                </div>
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Bradford Factor Score</p>
+                        <h3 id="report-bradford" class="text-5xl font-black mt-2 text-emerald-500">0</h3>
+                        <p id="bradford-warning" class="text-xs mt-2 hidden text-amber-500 flex items-center justify-center gap-1">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Watchlist Threshold Triggered (>100)
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Absences (Spells)</p>
+                        <h3 id="report-spells" class="text-5xl font-black mt-2 text-gray-900 dark:text-white">0</h3>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Absence Days</p>
+                        <h3 id="report-days" class="text-5xl font-black mt-2 text-gray-900 dark:text-white">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Personal Records Timeline</h4>
+                    <div id="individual-timeline" class="space-y-3">
+                        <!-- Loaded dynamically -->
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- MAIN INTERACTION MODAL -->
+    <!-- MAIN MODAL FOR SUBMISSIONS -->
     <div id="logActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
-                <h3 class="font-bold text-lg text-white">Log Operational Entry</h3>
+        <div class="bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+                <h3 class="font-bold text-lg text-gray-900 dark:text-white">Log Operational Entry</h3>
                 <button onclick="closeModal('logActionModal')" class="text-gray-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form id="entryForm" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Select Employee</label>
-                    <select class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500 text-sm">
-                        <option>Emil Tyson</option>
-                        <option>Sarah Jenkins</option>
+                    <select id="form-employee" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 text-sm">
+                        <option value="Emil Tyson">Emil Tyson</option>
+                        <option value="Sarah Jenkins">Sarah Jenkins</option>
+                        <option value="Michael Scott">Michael Scott</option>
+                        <option value="Dwight Schrute">Dwight Schrute</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Entry Target Type</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <label class="border border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
                             <input type="radio" name="entryType" value="absence" class="sr-only" checked>
-                            <i data-lucide="user-x" class="w-4 h-4 text-red-400"></i>
-                            <span class="text-xs text-gray-300 font-medium mt-1">Absenteeism</span>
+                            <i data-lucide="user-x" class="w-4 h-4 text-red-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">Absenteeism</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
                             <input type="radio" name="entryType" value="leave" class="sr-only">
-                            <i data-lucide="palm-tree" class="w-4 h-4 text-blue-400"></i>
-                            <span class="text-xs text-gray-300 font-medium mt-1">Annual Leave</span>
+                            <i data-lucide="palm-tree" class="w-4 h-4 text-blue-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">Annual Leave</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
                             <input type="radio" name="entryType" value="note" class="sr-only">
-                            <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
-                            <span class="text-xs text-gray-300 font-medium mt-1">File Note</span>
+                            <i data-lucide="file-text" class="w-4 h-4 text-amber-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">File Note</span>
                         </label>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label>
-                        <input type="date" class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <input id="form-start" type="date" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">End Date</label>
-                        <input type="date" class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <input id="form-end" type="date" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Context / Narrative Notes</label>
-                    <textarea rows="3" placeholder="Provide explicit timeline details or specific call-in contextual reasons..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
+                    <textarea id="form-notes" rows="3" required placeholder="Provide clear timeline details..." class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-650 text-gray-300 rounded-lg text-sm hover:bg-gray-700 transition font-medium">Cancel</button>
+                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-300 dark:border-gray-650 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition font-medium">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm transition font-medium">Save Entry</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- UI Logic and Theme Orchestration Script -->
+    <!-- MAIN UI ENGINE SCRIPT -->
     <script>
-        // Check localStorage or default strictly to dark mode
+        let allRecords = [];
+        let calendar = null;
+        let selectedEmployee = "";
+
+        // List of team members
+        const teamList = ["Emil Tyson", "Sarah Jenkins", "Michael Scott", "Dwight Schrute"];
+
+        // Initialize Theme preference
         const currentTheme = localStorage.getItem('theme') || 'dark';
-        
-        // Sync root HTML node layout to current status
         if (currentTheme === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
 
-        // Initialize Lucide Icons on load window
         window.addEventListener('DOMContentLoaded', () => {
             updateThemeIcon(currentTheme);
             lucide.createIcons();
+            initCalendar();
         });
 
+        // Initialize Dynamic FullCalendar
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar-element');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                themeSystem: 'standard',
+                events: []
+            });
+            calendar.render();
+        }
+
+        // Wait for Firebase to finish initializing before fetching records
+        window.addEventListener('firebase-initialized', () => {
+            fetchFirebaseRecords();
+        });
+
+        async function fetchFirebaseRecords() {
+            if (!window.db) return;
+            const { collection, getDocs, query, orderBy } = window.firestoreUtils;
+            
+            try {
+                const q = query(collection(window.db, "records"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                allRecords = [];
+                
+                querySnapshot.forEach((doc) => {
+                    allRecords.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderDashboard();
+                renderRoster();
+                updateCalendarEvents();
+            } catch (err) {
+                console.error("Failed fetching database documents: ", err);
+            }
+        }
+
+        // Form Submit Handler (Saves direct to cloud)
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const employee = document.getElementById('form-employee').value;
+            const entryType = document.querySelector('input[name="entryType"]:checked').value;
+            const startDate = document.getElementById('form-start').value;
+            const endDate = document.getElementById('form-end').value;
+            const notes = document.getElementById('form-notes').value;
+
+            try {
+                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
+                    employeeName: employee,
+                    type: entryType,
+                    startDate: startDate,
+                    endDate: endDate,
+                    notes: notes,
+                    timestamp: new Date().toISOString()
+                });
+
+                closeModal('logActionModal');
+                document.getElementById('entryForm').reset();
+                
+                // Instantly re-query database
+                await fetchFirebaseRecords();
+            } catch (error) {
+                console.error("Error writing entry: ", error);
+                alert("Writing failed. Please ensure your Firestore setup rules are correct.");
+            }
+        });
+
+        // Render Dashboard Data Lists
+        function renderDashboard() {
+            const tbody = document.getElementById('dashboard-table-body');
+            tbody.innerHTML = "";
+
+            let countAbsence = 0;
+            let countLeave = 0;
+            let countNotes = 0;
+
+            if (allRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No active logs registered in system database.</td></tr>`;
+                return;
+            }
+
+            allRecords.forEach(record => {
+                if (record.type === 'absence') countAbsence++;
+                if (record.type === 'leave') countLeave++;
+                if (record.type === 'note') countNotes++;
+
+                const typeColor = record.type === 'absence' ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400' :
+                                  record.type === 'leave' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400' : 
+                                  'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400';
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gray-100 dark:hover:bg-gray-750 border-b border-gray-200 dark:border-gray-700 cursor-pointer";
+                row.onclick = () => viewIndividualReport(record.employeeName);
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-gray-900 dark:text-white font-medium">${record.employeeName}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs ${typeColor}">${record.type}</span></td>
+                    <td class="px-4 py-3 text-xs">${record.startDate} to ${record.endDate}</td>
+                    <td class="px-4 py-3 text-xs truncate max-w-xs text-gray-500 dark:text-gray-400">${record.notes}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('stat-absences').innerText = countAbsence;
+            document.getElementById('stat-leave').innerText = countLeave;
+            document.getElementById('stat-notes').innerText = countNotes;
+        }
+
+        // Render Roster & Bradford factor cards
+        function renderRoster() {
+            const rosterContainer = document.getElementById('roster-list');
+            rosterContainer.innerHTML = "";
+
+            teamList.forEach(name => {
+                const empRecords = allRecords.filter(r => r.employeeName === name);
+                const stats = calculateBradford(empRecords);
+
+                const card = document.createElement('div');
+                card.className = "bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col justify-between cursor-pointer hover:border-emerald-500 transition";
+                card.onclick = () => viewIndividualReport(name);
+                
+                card.innerHTML = `
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white">${name}</h4>
+                        <p class="text-xs text-gray-400">Team Member</p>
+                        
+                        <div class="mt-4 flex justify-between items-center bg-white dark:bg-gray-700/30 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <span class="text-xs text-gray-400">Bradford Factor:</span>
+                            <span class="text-md font-bold ${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-400 flex justify-between">
+                        <span>${stats.spells} Absence spells</span>
+                        <span>${stats.days} Days lost</span>
+                    </div>
+                `;
+                rosterContainer.appendChild(card);
+            });
+        }
+
+        // Calculate Bradford Factor Score
+        // Formula: S² x D = Score (S: spells of sickness, D: total absence days)
+        function calculateBradford(records) {
+            const absences = records.filter(r => r.type === 'absence');
+            const spells = absences.length;
+            
+            let days = 0;
+            absences.forEach(r => {
+                const start = new Date(r.startDate);
+                const end = new Date(r.endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                days += diffDays;
+            });
+
+            return {
+                spells: spells,
+                days: days,
+                score: (spells * spells) * days
+            };
+        }
+
+        // Feed Firestore records to FullCalendar
+        function updateCalendarEvents() {
+            if (!calendar) return;
+            const events = allRecords.map(r => {
+                let color = '#3b82f6'; // blue for leave
+                if (r.type === 'absence') color = '#ef4444'; // red
+                if (r.type === 'note') color = '#f59e0b'; // amber
+
+                // Increment end date by 1 day because FullCalendar excludes end date in multi-day events
+                let endDateObj = new Date(r.endDate);
+                endDateObj.setDate(endDateObj.getDate() + 1);
+                const formattedEndDate = endDateObj.toISOString().split('T')[0];
+
+                return {
+                    title: `${r.employeeName} (${r.type})`,
+                    start: r.startDate,
+                    end: formattedEndDate,
+                    color: color
+                };
+            });
+            calendar.removeAllEvents();
+            calendar.addEventSource(events);
+        }
+
+        // Show Individual Personal report breakdown
+        function viewIndividualReport(name) {
+            selectedEmployee = name;
+            switchTab('individual');
+
+            document.getElementById('report-name').innerText = name;
+            
+            const empRecords = allRecords.filter(r => r.employeeName === name);
+            const stats = calculateBradford(empRecords);
+
+            document.getElementById('report-bradford').innerText = stats.score;
+            document.getElementById('report-spells').innerText = stats.spells;
+            document.getElementById('report-days').innerText = stats.days;
+
+            if (stats.score > 100) {
+                document.getElementById('bradford-warning').classList.remove('hidden');
+                document.getElementById('report-bradford').className = "text-5xl font-black mt-2 text-red-500";
+            } else {
+                document.getElementById('bradford-warning').classList.add('hidden');
+                document.getElementById('report-bradford').className = "text-5xl font-black mt-2 text-emerald-500";
+            }
+
+            const timeline = document.getElementById('individual-timeline');
+            timeline.innerHTML = "";
+
+            if (empRecords.length === 0) {
+                timeline.innerHTML = `<p class="text-center text-gray-500 py-4">No logged occurrences found for this individual.</p>`;
+                return;
+            }
+
+            empRecords.forEach(r => {
+                const borderClass = r.type === 'absence' ? 'border-red-500 bg-red-100 dark:bg-red-950/20' :
+                                    r.type === 'leave' ? 'border-blue-500 bg-blue-100 dark:bg-blue-950/20' : 
+                                    'border-amber-500 bg-amber-100 dark:bg-amber-950/20';
+                
+                timeline.innerHTML += `
+                    <div class="p-4 rounded-lg border-l-4 ${borderClass}">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-sm font-bold capitalize text-gray-900 dark:text-white">${r.type} Record</h5>
+                            <span class="text-xs text-gray-400">${r.startDate} to ${r.endDate}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-300 mt-2">${r.notes}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // UI View Tab Swapper
+        function switchTab(viewId) {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('calendar-view').classList.add('hidden');
+            document.getElementById('roster-view').classList.add('hidden');
+            document.getElementById('individual-view').classList.add('hidden');
+
+            // Reset navigation tab selection backgrounds
+            document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
+            document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
+            document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
+
+            if (viewId === 'dashboard') {
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
+            }
+            if (viewId === 'calendar') {
+                document.getElementById('calendar-view').classList.remove('hidden');
+                document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
+                setTimeout(() => { calendar.updateSize(); }, 50); // Refresh calendar sizing on render
+            }
+            if (viewId === 'roster') {
+                document.getElementById('roster-view').classList.remove('hidden');
+                document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
+            }
+            if (viewId === 'individual') {
+                document.getElementById('individual-view').classList.remove('hidden');
+            }
+        }
+
+        // Export To Excel
+        function exportToExcel() {
+            const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
+            const data = empRecords.map(r => ({
+                Employee: r.employeeName,
+                RecordType: r.type,
+                StartDate: r.startDate,
+                EndDate: r.endDate,
+                Context: r.notes
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Logs");
+            XLSX.writeFile(workbook, `${selectedEmployee.replace(/\s+/g, '_')}_Breakdown.xlsx`);
+        }
+
+        // Export To PDF Document
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
+            const stats = calculateBradford(empRecords);
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text("Attendance Summary Report", 14, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Employee Name: ${selectedEmployee}`, 14, 32);
+            doc.text(`Rolling Bradford Factor Score: ${stats.score}`, 14, 40);
+            doc.text(`Absence Spells: ${stats.spells}  |  Total Calendar Days Off: ${stats.days}`, 14, 48);
+            
+            doc.line(14, 54, 196, 54); // Horizontal line divider
+            
+            let y = 64;
+            doc.setFont("Helvetica", "bold");
+            doc.text("Timeline Log Entries:", 14, y);
+            y += 10;
+
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(10);
+            empRecords.forEach((r, i) => {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.text(`${i+1}. ${r.type.toUpperCase()}: ${r.startDate} to ${r.endDate}`, 14, y);
+                doc.text(`Notes: ${r.notes}`, 14, y + 6);
+                y += 18;
+            });
+
+            doc.save(`${selectedEmployee.replace(/\s+/g, '_')}_Report.pdf`);
+        }
+
+        // Dark/Light Theme State Handlers
         function toggleTheme() {
             const isDark = document.documentElement.classList.contains('dark');
             const newTheme = isDark ? 'light' : 'dark';
@@ -264,7 +651,6 @@
         function updateThemeIcon(theme) {
             const iconBtn = document.getElementById('theme-icon');
             if (!iconBtn) return;
-            
             if (theme === 'dark') {
                 iconBtn.setAttribute('data-lucide', 'sun'); 
             } else {
@@ -273,11 +659,7 @@
             lucide.createIcons();
         }
 
-        // Navigation helpers
-        function switchTab(viewId) {
-            document.getElementById('dashboard-view').classList.add('hidden');
-            if(viewId === 'dashboard') document.getElementById('dashboard-view').classList.remove('hidden');
-        }
+        // Modal Helpers
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     </script>
