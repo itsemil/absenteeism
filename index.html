@@ -20,36 +20,13 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
     <style>
-        .fc {
-            --fc-border-color: #374151;
-            --fc-page-bg-color: transparent;
-        }
-        .dark .fc-theme-standard td, .dark .fc-theme-standard th {
-            border-color: #374151;
-        }
-        .dark .fc-col-header-cell {
-            background-color: #1f2937;
-            color: #f3f4f6;
-        }
-        .fc-event {
-            cursor: pointer;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-        /* Sticky positioning helpers for the tracking matrix */
-        .sticky-col-left {
-            position: sticky;
-            left: 0;
-            z-index: 10;
-        }
-        .sticky-col-right {
-            position: sticky;
-            right: 0;
-            z-index: 10;
-        }
+        .fc { --fc-border-color: #374151; --fc-page-bg-color: transparent; }
+        .dark .fc-theme-standard td, .dark .fc-theme-standard th { border-color: #374151; }
+        .dark .fc-col-header-cell { background-color: #1f2937; color: #f3f4f6; }
+        .fc-event { cursor: pointer; border-radius: 4px; padding: 2px 4px; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .sticky-col-left { position: sticky; left: 0; z-index: 10; }
+        .sticky-col-right { position: sticky; right: 0; z-index: 10; }
     </style>
 
     <!-- FIREBASE MODULE SYSTEM -->
@@ -71,7 +48,6 @@
 
         window.db = db;
         window.firestoreUtils = { collection, addDoc, getDocs, query, orderBy };
-        
         window.dispatchEvent(new Event('firebase-initialized'));
     </script>
 </head>
@@ -86,12 +62,9 @@
                         <i data-lucide="shield-alert" class="text-emerald-400 w-8 h-8"></i>
                         <h1 class="text-xl font-bold tracking-tight text-white">OpsTracker</h1>
                     </div>
-                    <button onclick="toggleTheme()" class="p-1.5 rounded-lg border border-gray-650 hover:bg-gray-700 text-gray-400 transition">
-                        <i id="theme-icon" data-lucide="sun" class="w-4 h-4"></i>
-                    </button>
                 </div>
                 <nav class="space-y-2">
-                    <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-dashboard">
+                    <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition" id="btn-dashboard">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
                     </button>
                     <button onclick="switchTab('matrix')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-matrix">
@@ -107,6 +80,9 @@
             </div>
             
             <div class="pt-4 border-t border-gray-700 space-y-2">
+                <button onclick="openModal('addEmployeeModal')" class="w-full bg-gray-700 hover:bg-gray-650 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-xs">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Add New Employee
+                </button>
                 <button onclick="openModal('logActionModal')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition text-sm">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i> Log Leave / Note
                 </button>
@@ -125,10 +101,9 @@
                     </div>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <p class="text-sm text-gray-400 font-medium">Unplanned Sickness/Absence Events</p>
+                        <p class="text-sm text-gray-400 font-medium">Unplanned Sickness Events</p>
                         <h3 id="stat-absences" class="text-3xl font-bold mt-1 text-red-400">0</h3>
                     </div>
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
@@ -141,7 +116,6 @@
                     </div>
                 </div>
 
-                <!-- Tables Split Panel -->
                 <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
                     <h4 class="text-lg font-semibold mb-4 text-white">Recent Exceptions Log</h4>
                     <div class="overflow-x-auto">
@@ -156,7 +130,7 @@
                             </thead>
                             <tbody id="dashboard-table-body" class="divide-y divide-gray-700">
                                 <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with Firestore database...</td>
+                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with Cloud Firestore database...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -164,214 +138,200 @@
                 </div>
             </section>
 
-            <!-- SECTION 2: ATTENDANCE GRID MATRIX -->
+            <!-- SECTION 2: GRID MATRIX -->
             <section id="matrix-view" class="space-y-6 hidden">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Monthly Roster Matrix</h2>
-                        <p class="text-gray-400 text-sm">Click any cell to immediately log an attendance exception or review details.</p>
+                        <h2 id="matrix-month-heading" class="text-2xl font-bold text-white">Monthly Roster Matrix</h2>
+                        <p class="text-gray-400 text-sm">Click any grid cell to log entries or review details.</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <select id="matrix-month-select" onchange="buildMatrixGrid()" class="bg-gray-750 border border-gray-600 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-emerald-500">
-                            <option value="2026-07">July 2026</option>
-                            <option value="2026-08">August 2026</option>
-                        </select>
+                    <div class="flex items-center bg-gray-800 border border-gray-700 p-1.5 rounded-lg gap-2">
+                        <button onclick="navigateMatrixMonth(-1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <button onclick="jumpToCurrentMatrixMonth()" class="px-3 py-1 bg-gray-700 hover:bg-gray-650 text-white text-xs font-bold rounded-md transition">Today</button>
+                        <button onclick="navigateMatrixMonth(1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                     </div>
                 </div>
 
                 <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl">
                     <div class="overflow-x-auto max-w-full">
                         <table class="w-full text-left border-collapse text-xs text-gray-300">
-                            <thead class="bg-gray-850 border-b border-gray-700">
-                                <tr id="matrix-header-row">
-                                    <!-- Populated dynamically via script -->
-                                </tr>
+                            <thead class="bg-gray-855 border-b border-gray-700">
+                                <tr id="matrix-header-row"></tr>
                             </thead>
-                            <tbody id="matrix-body-rows" class="divide-y divide-gray-700 bg-gray-800">
-                                <!-- Populated dynamically via script -->
-                            </tbody>
+                            <tbody id="matrix-body-rows" class="divide-y divide-gray-700 bg-gray-800"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 3: DYNAMIC CALENDAR -->
+            <!-- SECTION 3: CALENDAR -->
             <section id="calendar-view" class="space-y-6 hidden">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white">Attendance Calendar</h2>
-                        <p class="text-gray-400 text-sm">Visual monthly and weekly event mapping.</p>
-                    </div>
-                </div>
-                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
-                    <div id="calendar-element"></div>
-                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6"><div id="calendar-element"></div></div>
             </section>
 
-            <!-- SECTION 4: TEAM DIRECTORY -->
+            <!-- SECTION 4: DIRECTORY -->
             <section id="roster-view" class="space-y-6 hidden">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Team Directory</h2>
-                    <p class="text-gray-400 text-sm">Select an employee to view organizational history, core drivers, and operational review metrics.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-list">
-                    <!-- Loaded dynamically -->
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-list"></div>
             </section>
 
-            <!-- SECTION 5: INDIVIDUAL BREAKDOWN & PROFILE REPORT -->
+            <!-- SECTION 5: PROFILE OVERVIEW -->
             <section id="individual-view" class="space-y-6 hidden">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-4">
-                        <button onclick="switchTab('roster')" class="p-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-400 transition">
-                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                        </button>
+                        <button onclick="switchTab('roster')" class="p-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-400 transition"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <div>
                             <h2 id="report-name" class="text-2xl font-bold text-white">Employee Name</h2>
-                            <p id="report-role" class="text-gray-400 text-sm">Role | Crew Assignment</p>
+                            <p id="report-role" class="text-gray-400 text-sm">-</p>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="exportToExcel()" class="bg-gray-750 hover:bg-gray-700 border border-gray-700 text-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium">
-                            <i data-lucide="download" class="w-4 h-4"></i> Export Excel
-                        </button>
-                        <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> Generate PDF Breakdown
-                        </button>
+                        <button onclick="exportToExcel()" class="bg-gray-750 hover:bg-gray-700 border border-gray-700 text-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium"><i data-lucide="download" class="w-4 h-4"></i> Export Excel</button>
+                        <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm transition font-medium"><i data-lucide="file-text" class="w-4 h-4"></i> Generate PDF Breakdown</button>
                     </div>
                 </div>
 
-                <!-- Deep Profiling Context Cards -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Profile Card Details -->
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-4">
-                        <div class="flex items-center gap-3 border-b border-gray-700 pb-3">
-                            <i data-lucide="user" class="text-emerald-400 w-5 h-5"></i>
-                            <h4 class="font-bold text-md text-white">Personal Profile Details</h4>
-                        </div>
-                        <div>
-                            <span class="text-xs uppercase text-gray-400 block font-bold">Contact Status</span>
-                            <p id="profile-contact" class="text-sm font-medium mt-0.5 text-gray-200">-</p>
-                        </div>
-                        <div>
-                            <span class="text-xs uppercase text-gray-400 block font-bold">Rostered Shift Setup</span>
-                            <p id="profile-shift" class="text-sm font-medium mt-0.5 text-gray-200">-</p>
-                        </div>
+                        <h4 class="font-bold text-md text-white border-b border-gray-700 pb-2">Personal Details</h4>
+                        <div><span class="text-xs text-gray-400 block">Contact Status</span><p id="profile-contact" class="text-sm font-medium text-gray-200">-</p></div>
+                        <div><span class="text-xs text-gray-400 block">Shift Setup</span><p id="profile-shift" class="text-sm font-medium text-gray-200">-</p></div>
                     </div>
-
-                    <!-- Motivation Card -->
                     <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-4">
-                        <div class="flex items-center gap-3 border-b border-gray-700 pb-3">
-                            <i data-lucide="compass" class="text-amber-400 w-5 h-5"></i>
-                            <h4 class="font-bold text-md text-white">Core Workplace Motivation Drivers</h4>
-                        </div>
-                        <div>
-                            <span class="text-xs uppercase text-amber-400 block font-bold tracking-wider">Primary Driver Tag</span>
-                            <div class="mt-1">
-                                <span id="profile-driver-badge" class="px-2.5 py-1 text-xs font-bold rounded-full border bg-amber-950/40 text-amber-300 border-amber-900">Driver</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="text-xs uppercase text-gray-400 block font-bold">Performance Narrative Context</span>
-                            <p id="profile-driver-desc" class="text-sm font-medium mt-1 text-gray-300 leading-relaxed">-</p>
-                        </div>
+                        <h4 class="font-bold text-md text-white border-b border-gray-700 pb-2">Workplace Motivation</h4>
+                        <div><span id="profile-driver-badge" class="px-2.5 py-1 text-xs font-bold rounded-full border bg-amber-950/40 text-amber-300 border-amber-900">-</span></div>
+                        <p id="profile-driver-desc" class="text-sm text-gray-300 mt-2">-</p>
                     </div>
                 </div>
 
-                <!-- Score Matrix Block -->
+                <!-- NEW COMPONENT: TIMELINE FILTER MODIFIERS -->
+                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <span class="text-xs uppercase font-bold text-gray-400 tracking-wider">Multi-Select Categories:</span>
+                        <div class="flex flex-wrap gap-3">
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="AL" class="filter-chk accent-emerald-500"> AL</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="SL" class="filter-chk accent-emerald-500"> SL</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="CL" class="filter-chk accent-emerald-500"> CL</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="LI" class="filter-chk accent-emerald-500"> LI</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="LE" class="filter-chk accent-emerald-500"> LE</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="WC" class="filter-chk accent-emerald-500"> WC</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="FN" class="filter-chk accent-emerald-500"> FN</label>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">Order By:</span>
+                        <select id="filter-sort-order" onchange="updateFilteredTimeline()" class="bg-gray-750 border border-gray-650 rounded px-2 py-1 text-xs text-white focus:outline-none">
+                            <option value="desc">Newest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 text-center">
-                        <p class="text-sm text-gray-400 font-medium">Bradford Factor Score</p>
+                        <p class="text-sm text-gray-400 font-medium">Bradford Score</p>
                         <h3 id="report-bradford" class="text-5xl font-black mt-2 text-emerald-400">0</h3>
-                        <p id="bradford-warning" class="text-xs mt-2 hidden text-amber-400 flex items-center justify-center gap-1">
-                            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Watchlist Threshold Triggered (>100)
-                        </p>
+                        <p id="bradford-warning" class="text-xs mt-2 hidden text-amber-500">Action Threshold Triggered (>100)</p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 text-center">
-                        <p class="text-sm text-gray-400 font-medium">Total Absences (Spells)</p>
-                        <h3 id="report-spells" class="text-5xl font-black mt-2 text-white">0</h3>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 text-center">
-                        <p class="text-sm text-gray-400 font-medium">Total Absence Days</p>
-                        <h3 id="report-days" class="text-5xl font-black mt-2 text-white">0</h3>
-                    </div>
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 text-center"><p class="text-sm text-gray-400 font-medium">Total Absences (Spells)</p><h3 id="report-spells" class="text-5xl font-black mt-2 text-white">0</h3></div>
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 text-center"><p class="text-sm text-gray-400 font-medium">Total Absence Days</p><h3 id="report-days" class="text-5xl font-black mt-2 text-white">0</h3></div>
                 </div>
 
-                <!-- Personal Records Timeline -->
                 <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
                     <h4 class="text-lg font-semibold mb-4 text-white">Personal Records Timeline</h4>
-                    <div id="individual-timeline" class="space-y-3">
-                        <!-- Loaded dynamically -->
-                    </div>
+                    <div id="individual-timeline" class="space-y-3"></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- ACTION SUBMISSION MODAL -->
+    <!-- NEW MODAL: DYNAMIC WORKER REGISTRATION -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+                <h3 class="font-bold text-lg text-white">Register New Team Member</h3>
+                <button type="button" onclick="closeModal('addEmployeeModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="employeeForm" class="p-6 space-y-4">
+                <div><label class="block text-xs text-gray-400 font-bold mb-1">Full Name</label><input id="emp-name" type="text" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs text-gray-400 font-bold mb-1">Role Title</label><input id="emp-role" type="text" placeholder="Operator" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                    <div><label class="block text-xs text-gray-400 font-bold mb-1">Crew Assignment</label><input id="emp-crew" type="text" placeholder="Crew A" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                </div>
+                <div><label class="block text-xs text-gray-400 font-bold mb-1">Contact Email</label><input id="emp-contact" type="email" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                <div><label class="block text-xs text-gray-400 font-bold mb-1">Shift Setup</label><input id="emp-shift" type="text" placeholder="Fixed Day Shift" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Motivation Tag</label>
+                        <select id="emp-driver" class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none">
+                            <option value="Family Stability">Family Stability</option>
+                            <option value="Financial Optimization">Financial Optimization</option>
+                            <option value="Travel & Adventure">Travel & Adventure</option>
+                            <option value="Retirement Goal">Retirement Goal</option>
+                        </select>
+                    </div>
+                </div>
+                <div><label class="block text-xs text-gray-400 font-bold mb-1">Performance Driver Narrative Description</label><textarea id="emp-desc" rows="3" required placeholder="Outline internal work drivers..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></textarea></div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('addEmployeeModal')" class="px-4 py-2 border border-gray-650 text-gray-300 text-sm rounded-lg hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-medium">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RECONFIGURED LOG ACTION MODAL -->
     <div id="logActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
                 <h3 class="font-bold text-lg text-white">Log Operational Entry</h3>
-                <button type="button" onclick="closeModal('logActionModal')" class="text-gray-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button type="button" onclick="closeModal('logActionModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form id="entryForm" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Select Employee</label>
-                    <select id="form-employee" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 text-sm">
-                        <option value="Emil Tyson" class="text-white bg-gray-750">Emil Tyson</option>
-                        <option value="Sarah Jenkins" class="text-white bg-gray-750">Sarah Jenkins</option>
-                        <option value="Michael Scott" class="text-white bg-gray-750">Michael Scott</option>
-                        <option value="Dwight Schrute" class="text-white bg-gray-750">Dwight Schrute</option>
-                    </select>
+                    <select id="form-employee" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 text-sm"></select>
                 </div>
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Entry Target Type</label>
-                    <div class="grid grid-cols-5 gap-1.5">
+                    <div class="grid grid-cols-4 gap-1.5">
                         <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="absence" class="sr-only" checked>
-                            <i data-lucide="user-x" class="w-4 h-4 text-red-400"></i>
-                            <span class="text-[10px] text-gray-200 font-semibold mt-1">Absent</span>
+                            <input type="radio" name="entryType" value="AL" class="sr-only">
+                            <span class="text-xs text-blue-400 font-bold">AL</span><span class="text-[9px] text-gray-400">Leave</span>
                         </label>
                         <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="leave" class="sr-only">
-                            <i data-lucide="palm-tree" class="w-4 h-4 text-blue-400"></i>
-                            <span class="text-[10px] text-gray-200 font-semibold mt-1">Leave</span>
+                            <input type="radio" name="entryType" value="SL" class="sr-only" checked>
+                            <span class="text-xs text-red-400 font-bold">SL</span><span class="text-[9px] text-gray-400">Sick</span>
                         </label>
                         <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="late" class="sr-only">
-                            <i data-lucide="clock" class="w-4 h-4 text-purple-400"></i>
-                            <span class="text-[10px] text-gray-200 font-semibold mt-1">Late In</span>
+                            <input type="radio" name="entryType" value="CL" class="sr-only">
+                            <span class="text-xs text-orange-400 font-bold">CL</span><span class="text-[9px] text-gray-400">Carer</span>
                         </label>
                         <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="early" class="sr-only">
-                            <i data-lucide="log-out" class="w-4 h-4 text-violet-400"></i>
-                            <span class="text-[10px] text-gray-200 font-semibold mt-1">Early Out</span>
+                            <input type="radio" name="entryType" value="LI" class="sr-only">
+                            <span class="text-xs text-purple-400 font-bold">LI</span><span class="text-[9px] text-gray-400">Late</span>
                         </label>
                         <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="note" class="sr-only">
-                            <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
-                            <span class="text-[10px] text-gray-200 font-semibold mt-1">Note</span>
+                            <input type="radio" name="entryType" value="LE" class="sr-only">
+                            <span class="text-xs text-violet-400 font-bold">LE</span><span class="text-[9px] text-gray-400">Early</span>
+                        </label>
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                            <input type="radio" name="entryType" value="WC" class="sr-only">
+                            <span class="text-xs text-pink-400 font-bold">WC</span><span class="text-[9px] text-gray-400">Cover</span>
+                        </label>
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                            <input type="radio" name="entryType" value="FN" class="sr-only">
+                            <span class="text-xs text-amber-400 font-bold">FN</span><span class="text-[9px] text-gray-400">Note</span>
                         </label>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label>
-                        <input id="form-start" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">End Date</label>
-                        <input id="form-end" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-emerald-500">
-                    </div>
+                    <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label><input id="form-start" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none"></div>
+                    <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">End Date</label><input id="form-end" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none"></div>
                 </div>
-                <div>
-                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Context / Narrative Notes</label>
-                    <textarea id="form-notes" rows="3" required placeholder="Provide narrative tracking reasons..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-medium text-sm focus:outline-none focus:border-emerald-500 placeholder-gray-550"></textarea>
-                </div>
+                <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Narrative Notes</label><textarea id="form-notes" rows="3" required placeholder="Provide record log context parameters..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-medium text-sm focus:outline-none placeholder-gray-500"></textarea></div>
                 <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-650 text-gray-300 rounded-lg text-sm hover:bg-gray-700 transition font-medium">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm transition font-medium">Save Entry</button>
+                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-650 text-gray-300 rounded-lg text-sm hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium">Save Entry</button>
                 </div>
             </form>
         </div>
@@ -380,26 +340,25 @@
     <!-- MAIN UI ENGINE SCRIPT -->
     <script>
         let allRecords = [];
+        let employeeList = [];
         let calendar = null;
         let selectedEmployee = "";
-
-        const teamProfiles = {
-            "Emil Tyson": { role: "Shift Supervisor", crew: "Crew A", contact: "emil.tyson@factory.com", shift: "Rotating Roster - Day/Night 12h", driver: "Retirement Goal", description: "Focused heavily on long-term wealth stabilization and process alignment. Transitioning systematically to cruise comfortably into retirement within the decade while training up shift updates." },
-            "Sarah Jenkins": { role: "Line Operator", crew: "Crew B", contact: "s.jenkins@factory.com", shift: "Fixed Day Shift", driver: "Family Stability", description: "Driven primarily by supporting dependents at home. Highly values clear consistency, weekend availability protections, and reliable scheduling predictability to balance active home management." },
-            "Michael Scott": { role: "Production Lead", crew: "Crew A", contact: "m.scott@factory.com", shift: "Standard Day Shift", driver: "Travel & Adventure", description: "Uses seasonal operational block breaks to fund personal international travel and holiday cruising. Highly responsive to efficiency performance bonuses that supplement recreational milestones." },
-            "Dwight Schrute": { role: "Logistics Specialist", crew: "Crew C", contact: "d.schrute@factory.com", shift: "Fixed Night Shift", driver: "Financial Optimization", description: "Aggressively maximizes overtime allocations and shift differential premiums. Motivated directly by base revenue optimization, investments, and maximizing operational output targets." }
-        };
-
-        const teamList = Object.keys(teamProfiles);
-
-        // Enforce dark mode as structural application runtime theme baseline
-        localStorage.setItem('theme', 'dark');
-        document.documentElement.classList.add('dark');
+        
+        let matrixCurrentYear = 2026;
+        let matrixCurrentMonth = 7;
 
         window.addEventListener('DOMContentLoaded', () => {
             updateThemeIcon('dark');
-            lucide.createIcons();
             initCalendar();
+            
+            const today = new Date();
+            matrixCurrentYear = today.getFullYear();
+            matrixCurrentMonth = today.getMonth() + 1;
+
+            // Bind checklist filtering listeners to dynamic modifier updates
+            document.querySelectorAll('.filter-chk').forEach(elem => {
+                elem.addEventListener('change', updateFilteredTimeline);
+            });
         });
 
         function initCalendar() {
@@ -407,118 +366,156 @@
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                themeSystem: 'standard',
                 events: []
             });
             calendar.render();
         }
 
         window.addEventListener('firebase-initialized', () => {
-            fetchFirebaseRecords();
+            syncDataEngine();
         });
 
-        async function fetchFirebaseRecords() {
+        async function syncDataEngine() {
             if (!window.db) return;
             const { collection, getDocs, query, orderBy } = window.firestoreUtils;
             
             try {
-                const q = query(collection(window.db, "records"), orderBy("timestamp", "desc"));
-                const querySnapshot = await getDocs(q);
-                allRecords = [];
-                
-                querySnapshot.forEach((doc) => {
-                    allRecords.push({ id: doc.id, ...doc.data() });
-                });
+                // 1. Sync employee rosters
+                const empSnap = await getDocs(collection(window.db, "employees"));
+                employeeList = [];
+                empSnap.forEach(doc => employeeList.push({ id: doc.id, ...doc.data() }));
 
+                // 2. Sync history records
+                const recordSnap = await getDocs(query(collection(window.db, "records"), orderBy("timestamp", "desc")));
+                allRecords = [];
+                recordSnap.forEach(doc => allRecords.push({ id: doc.id, ...doc.data() }));
+
+                updateGlobalFormSelectors();
                 renderDashboard();
                 buildMatrixGrid();
                 renderRoster();
                 updateCalendarEvents();
+                
+                if(selectedEmployee) viewIndividualReport(selectedEmployee);
             } catch (err) {
-                console.error("Database connection fault: ", err);
+                console.error("Firestore loading failure: ", err);
             }
         }
 
-        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+        // Form Submission - Dynamic Employee Registration
+        document.getElementById('employeeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const employee = document.getElementById('form-employee').value;
-            const entryType = document.querySelector('input[name="entryType"]:checked').value;
-            const startDate = document.getElementById('form-start').value;
-            const endDate = document.getElementById('form-end').value;
-            const notes = document.getElementById('form-notes').value;
-
             try {
-                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
-                    employeeName: employee,
-                    type: entryType,
-                    startDate: startDate,
-                    endDate: endDate,
-                    notes: notes,
-                    timestamp: new Date().toISOString()
+                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "employees"), {
+                    name: document.getElementById('emp-name').value,
+                    role: document.getElementById('emp-role').value,
+                    crew: document.getElementById('emp-crew').value,
+                    contact: document.getElementById('emp-contact').value,
+                    shift: document.getElementById('emp-shift').value,
+                    driver: document.getElementById('emp-driver').value,
+                    description: document.getElementById('emp-desc').value
                 });
-
-                closeModal('logActionModal');
-                document.getElementById('entryForm').reset();
-                await fetchFirebaseRecords();
-            } catch (error) {
-                console.error("Firestore submission error: ", error);
-                alert("Submission failed. Ensure Cloud Firestore rules allow read/write operations.");
+                closeModal('addEmployeeModal');
+                document.getElementById('employeeForm').reset();
+                await syncDataEngine();
+            } catch(err) {
+                alert("Error adding employee profile.");
             }
         });
 
-        // GENERATE MATRIX SPREADSHEET ENGINE
+        // Form Submission - Operational Log Entries
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
+                    employeeName: document.getElementById('form-employee').value,
+                    type: document.querySelector('input[name="entryType"]:checked').value,
+                    startDate: document.getElementById('form-start').value,
+                    endDate: document.getElementById('form-end').value,
+                    notes: document.getElementById('form-notes').value,
+                    timestamp: new Date().toISOString()
+                });
+                closeModal('logActionModal');
+                document.getElementById('entryForm').reset();
+                await syncDataEngine();
+            } catch (err) {
+                alert("Error writing log entry documentation.");
+            }
+        });
+
+        function updateGlobalFormSelectors() {
+            const selectEl = document.getElementById('form-employee');
+            selectEl.innerHTML = "";
+            employeeList.forEach(emp => {
+                selectEl.innerHTML += `<option value="${emp.name}" class="text-white bg-gray-750">${emp.name}</option>`;
+            });
+        }
+
+        function navigateMatrixMonth(direction) {
+            matrixCurrentMonth += direction;
+            if (matrixCurrentMonth > 12) { matrixCurrentMonth = 1; matrixCurrentYear++; }
+            if (matrixCurrentMonth < 1) { matrixCurrentMonth = 12; matrixCurrentYear--; }
+            buildMatrixGrid();
+        }
+
+        function jumpToCurrentMatrixMonth() {
+            const today = new Date();
+            matrixCurrentYear = today.getFullYear();
+            matrixCurrentMonth = today.getMonth() + 1;
+            buildMatrixGrid();
+        }
+
         function buildMatrixGrid() {
-            const monthVal = document.getElementById('matrix-month-select').value; // e.g., "2026-07"
-            const [year, month] = monthVal.split('-').map(Number);
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('matrix-month-heading').innerText = `${monthNames[matrixCurrentMonth - 1]} ${matrixCurrentYear} - Roster Grid`;
             
-            const daysInMonth = new Date(year, month, 0).getDate();
+            const monthValKey = `${matrixCurrentYear}-${String(matrixCurrentMonth).padStart(2, '0')}`;
+            const daysInMonth = new Date(matrixCurrentYear, matrixCurrentMonth, 0).getDate();
             
             const headerRow = document.getElementById('matrix-header-row');
             const bodyRows = document.getElementById('matrix-body-rows');
             
-            // Build headers
-            headerRow.innerHTML = `<th class="px-4 py-3 sticky-col-left bg-gray-850 text-white font-bold z-20 min-w-[160px]">Employee</th>`;
+            headerRow.innerHTML = `<th class="px-4 py-3 sticky-col-left bg-gray-850 text-white font-bold border-r border-gray-700 min-w-[160px]">Employee</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
                 headerRow.innerHTML += `<th class="px-2 py-3 text-center min-w-[40px] font-bold">${d}</th>`;
             }
-            headerRow.innerHTML += `<th class="px-4 py-3 sticky-col-right bg-gray-850 text-white font-bold z-20 text-center min-w-[120px]">Totals (Abs / BF)</th>`;
+            headerRow.innerHTML += `<th class="px-4 py-3 sticky-col-right bg-gray-850 text-white font-bold border-l border-gray-700 text-center min-w-[140px]">Totals (Abs / BF)</th>`;
 
-            // Build rows for each worker
             bodyRows.innerHTML = "";
-            teamList.forEach(name => {
-                const empRecords = allRecords.filter(r => r.employeeName === name);
+            if(employeeList.length === 0) {
+                bodyRows.innerHTML = `<tr><td colspan="${daysInMonth+2}" class="p-6 text-center text-gray-500">No active team members registered in system database.</td></tr>`;
+                return;
+            }
+
+            employeeList.forEach(emp => {
+                const empRecords = allRecords.filter(r => r.employeeName === emp.name);
                 const stats = calculateBradford(empRecords);
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-750 border-b border-gray-700";
                 
-                // Left Employee Column Anchor
-                let rowHTML = `<td class="px-4 py-3 sticky-col-left bg-gray-800 text-white font-medium z-10 border-r border-gray-700 hover:underline cursor-pointer" onclick="viewIndividualReport('${name}')">${name}</td>`;
+                let rowHTML = `<td class="px-4 py-3 sticky-col-left bg-gray-800 text-white border-r border-gray-700 hover:underline cursor-pointer font-medium" onclick="viewIndividualReport('${emp.name}')">${emp.name}</td>`;
                 
-                // Calendar grid day squares
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const dayStr = String(d).padStart(2, '0');
-                    const currentCellDate = `${monthVal}-${dayStr}`;
+                    const currentCellDate = `${monthValKey}-${String(d).padStart(2, '0')}`;
+                    const match = empRecords.find(r => currentCellDate >= r.startDate && currentCellDate <= r.endDate);
                     
-                    // Cross reference records falling on this day
-                    const matchingRecord = empRecords.find(r => currentCellDate >= r.startDate && currentCellDate <= r.endDate);
-                    
-                    let cellMarkup = "";
-                    if (matchingRecord) {
-                        if (matchingRecord.type === 'absence') cellMarkup = `<span class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold" title="${matchingRecord.notes}">ABS</span>`;
-                        if (matchingRecord.type === 'leave') cellMarkup = `<span class="bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold" title="${matchingRecord.notes}">LV</span>`;
-                        if (matchingRecord.type === 'late') cellMarkup = `<span class="bg-purple-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold" title="${matchingRecord.notes}">LT</span>`;
-                        if (matchingRecord.type === 'early') cellMarkup = `<span class="bg-violet-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold" title="${matchingRecord.notes}">ER</span>`;
-                        if (matchingRecord.type === 'note') cellMarkup = `<span class="bg-amber-600 text-black text-[9px] px-1.5 py-0.5 rounded font-bold" title="${matchingRecord.notes}">NT</span>`;
+                    let badge = "";
+                    if (match) {
+                        let c = "bg-amber-600 text-black";
+                        if(match.type === 'SL') c = "bg-red-600 text-white";
+                        if(match.type === 'AL') c = "bg-blue-600 text-white";
+                        if(match.type === 'CL') c = "bg-orange-600 text-white";
+                        if(match.type === 'LI') c = "bg-purple-600 text-white";
+                        if(match.type === 'LE') c = "bg-violet-600 text-white";
+                        if(match.type === 'WC') c = "bg-pink-600 text-white";
+                        badge = `<span class="${c} text-[9px] px-1.5 py-0.5 rounded font-black">${match.type}</span>`;
                     }
-                    
-                    rowHTML += `<td class="p-1 text-center border-r border-gray-700 h-10 cursor-pointer hover:bg-gray-700 transition" onclick="clickMatrixCell('${name}', '${currentCellDate}')">${cellMarkup}</td>`;
+                    rowHTML += `<td class="p-1 text-center border-r border-gray-700 h-10 cursor-pointer hover:bg-gray-700 transition" onclick="clickMatrixCell('${emp.name}', '${currentCellDate}')">${badge}</td>`;
                 }
                 
-                // Right Totals column anchor
-                rowHTML += `<td class="px-4 py-3 sticky-col-right bg-gray-800 border-l border-gray-700 text-center font-bold text-gray-300 z-10">
-                    <span class="text-red-400">${stats.days}d</span> / <span class="${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
+                rowHTML += `<td class="px-4 py-3 sticky-col-right bg-gray-800 border-l border-gray-700 text-center font-bold text-gray-300">
+                    <span class="text-red-400">${stats.days}d</span> lost / <span class="${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
                 </td>`;
                 
                 tr.innerHTML = rowHTML;
@@ -526,8 +523,8 @@
             });
         }
 
-        function clickMatrixCell(employeeName, dateStr) {
-            document.getElementById('form-employee').value = employeeName;
+        function clickMatrixCell(name, dateStr) {
+            document.getElementById('form-employee').value = name;
             document.getElementById('form-start').value = dateStr;
             document.getElementById('form-end').value = dateStr;
             openModal('logActionModal');
@@ -536,164 +533,152 @@
         function renderDashboard() {
             const tbody = document.getElementById('dashboard-table-body');
             tbody.innerHTML = "";
-
-            let countAbsence = 0;
-            let countLeave = 0;
-            let countNotes = 0;
+            let sl = 0, al = 0, fn = 0;
 
             if (allRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No entries registered in database yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No logs saved.</td></tr>`;
                 return;
             }
 
-            allRecords.forEach(record => {
-                if (record.type === 'absence') countAbsence++;
-                if (record.type === 'leave') countLeave++;
-                if (record.type === 'note') countNotes++;
+            allRecords.forEach(r => {
+                if (r.type === 'SL') sl++;
+                if (r.type === 'AL') al++;
+                if (r.type === 'FN') fn++;
 
-                let typeColor = 'bg-amber-950 text-amber-350 border-amber-900';
-                if (record.type === 'absence') typeColor = 'bg-red-950 text-red-400 border-red-900';
-                if (record.type === 'leave') typeColor = 'bg-blue-950 text-blue-400 border-blue-900';
-                if (record.type === 'late' || record.type === 'early') typeColor = 'bg-purple-950 text-purple-400 border-purple-900';
+                let col = 'bg-amber-950 text-amber-300 border-amber-900';
+                if(r.type==='SL') col='bg-red-950 text-red-400 border-red-900';
+                if(r.type==='AL') col='bg-blue-950 text-blue-400 border-red-900';
 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-gray-750 border-b border-gray-700 cursor-pointer";
-                row.onclick = () => viewIndividualReport(record.employeeName);
+                row.onclick = () => viewIndividualReport(r.employeeName);
                 row.innerHTML = `
-                    <td class="px-4 py-3 text-white font-medium">${record.employeeName}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs font-semibold ${typeColor}">${record.type}</span></td>
-                    <td class="px-4 py-3 text-xs text-gray-300">${record.startDate} to ${record.endDate}</td>
-                    <td class="px-4 py-3 text-xs truncate max-w-xs text-gray-400">${record.notes}</td>
+                    <td class="px-4 py-3 text-white font-medium">${r.employeeName}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs font-semibold ${col}">${r.type}</span></td>
+                    <td class="px-4 py-3 text-xs text-gray-300">${r.startDate} to ${r.endDate}</td>
+                    <td class="px-4 py-3 text-xs truncate max-w-xs text-gray-400">${r.notes}</td>
                 `;
                 tbody.appendChild(row);
             });
 
-            document.getElementById('stat-absences').innerText = countAbsence;
-            document.getElementById('stat-leave').innerText = countLeave;
-            document.getElementById('stat-notes').innerText = countNotes;
+            document.getElementById('stat-absences').innerText = sl;
+            document.getElementById('stat-leave').innerText = al;
+            document.getElementById('stat-notes').innerText = fn;
         }
 
         function renderRoster() {
-            const rosterContainer = document.getElementById('roster-list');
-            rosterContainer.innerHTML = "";
+            const container = document.getElementById('roster-list');
+            container.innerHTML = "";
 
-            teamList.forEach(name => {
-                const profile = teamProfiles[name];
-                const empRecords = allRecords.filter(r => r.employeeName === name);
+            employeeList.forEach(emp => {
+                const empRecords = allRecords.filter(r => r.employeeName === emp.name);
                 const stats = calculateBradford(empRecords);
 
                 const card = document.createElement('div');
                 card.className = "bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col justify-between cursor-pointer hover:border-emerald-500 transition";
-                card.onclick = () => viewIndividualReport(name);
-                
+                card.onclick = () => viewIndividualReport(emp.name);
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="text-lg font-bold text-white">${name}</h4>
-                                <p class="text-xs text-gray-400">${profile.role} | ${profile.crew}</p>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-700 text-gray-300">${profile.driver}</span>
+                            <div><h4 class="text-lg font-bold text-white">${emp.name}</h4><p class="text-xs text-gray-400">${emp.role} | ${emp.crew}</p></div>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-gray-700 text-gray-300">${emp.driver}</span>
                         </div>
-                        
                         <div class="mt-4 flex justify-between items-center bg-gray-700/30 p-3 rounded-lg border border-gray-700">
                             <span class="text-xs text-gray-400">Bradford Score:</span>
                             <span class="text-md font-bold ${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
                         </div>
                     </div>
-                    <div class="mt-4 text-xs text-gray-400 flex justify-between pt-2 border-t border-gray-700">
-                        <span>${stats.spells} Spells</span>
-                        <span>${stats.days} Days lost</span>
-                    </div>
                 `;
-                rosterContainer.appendChild(card);
+                container.appendChild(card);
             });
         }
 
         function calculateBradford(records) {
-            const absences = records.filter(r => r.type === 'absence');
+            const absences = records.filter(r => r.type === 'SL' || r.type === 'CL');
             const spells = absences.length;
-            
             let days = 0;
             absences.forEach(r => {
                 const start = new Date(r.startDate);
                 const end = new Date(r.endDate);
-                const diffTime = Math.abs(end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                days += diffDays;
+                days += Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
             });
-
-            return { spells: spells, days: days, score: (spells * spells) * days };
+            return { spells, days, score: (spells * spells) * days };
         }
 
         function updateCalendarEvents() {
             if (!calendar) return;
             const events = allRecords.map(r => {
-                let color = '#3b82f6'; 
-                if (r.type === 'absence') color = '#ef4444'; 
-                if (r.type === 'note') color = '#f59e0b';
-                if (r.type === 'late' || r.type === 'early') color = '#a855f7';
-
-                let endDateObj = new Date(r.endDate);
-                endDateObj.setDate(endDateObj.getDate() + 1);
-                const formattedEndDate = endDateObj.toISOString().split('T')[0];
-
-                return { title: `${r.employeeName} (${r.type})`, start: r.startDate, end: formattedEndDate, color: color };
+                let c = '#ef4444'; // SL
+                if(r.type==='AL') c='#3b82f6';
+                if(r.type==='FN') c='#f59e0b';
+                
+                let endObj = new Date(r.endDate);
+                endObj.setDate(endObj.getDate() + 1);
+                return { title: `${r.employeeName} [${r.type}]`, start: r.startDate, end: endObj.toISOString().split('T')[0], color: c };
             });
             calendar.removeAllEvents();
             calendar.addEventSource(events);
+        }
+
+        // FILTERED RUNTIME LOGIC FOR LIVE VIEW TIMELINE
+        function getFilteredAndSortedRecords(name) {
+            // 1. Resolve multi select checked inputs
+            const checkedTypes = Array.from(document.querySelectorAll('.filter-chk:checked')).map(el => el.value);
+            const sortOrder = document.getElementById('filter-sort-order').value;
+
+            let records = allRecords.filter(r => r.employeeName === name && checkedTypes.includes(r.type));
+            
+            // 2. Execute array sorting transforms
+            records.sort((a, b) => {
+                const dateA = new Date(a.startDate);
+                const dateB = new Date(b.startDate);
+                return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+            });
+
+            return records;
         }
 
         function viewIndividualReport(name) {
             selectedEmployee = name;
             switchTab('individual');
 
-            const profile = teamProfiles[name];
+            const emp = employeeList.find(e => e.name === name) || { role: "-", crew: "-", contact: "-", shift: "-", driver: "-", description: "-" };
             const empRecords = allRecords.filter(r => r.employeeName === name);
             const stats = calculateBradford(empRecords);
 
             document.getElementById('report-name').innerText = name;
-            document.getElementById('report-role').innerText = `${profile.role} | ${profile.crew}`;
-            document.getElementById('profile-contact').innerText = profile.contact;
-            document.getElementById('profile-shift').innerText = profile.shift;
-            document.getElementById('profile-driver-badge').innerText = profile.driver;
-            document.getElementById('profile-driver-desc').innerText = profile.description;
+            document.getElementById('report-role').innerText = `${emp.role} | ${emp.crew}`;
+            document.getElementById('profile-contact').innerText = emp.contact;
+            document.getElementById('profile-shift').innerText = emp.shift;
+            document.getElementById('profile-driver-badge').innerText = emp.driver;
+            document.getElementById('profile-driver-desc').innerText = emp.description;
 
             document.getElementById('report-bradford').innerText = stats.score;
             document.getElementById('report-spells').innerText = stats.spells;
             document.getElementById('report-days').innerText = stats.days;
 
-            if (stats.score > 100) {
-                document.getElementById('bradford-warning').classList.remove('hidden');
-                document.getElementById('report-bradford').className = "text-5xl font-black mt-2 text-red-400";
-            } else {
-                document.getElementById('bradford-warning').classList.add('hidden');
-                document.getElementById('report-bradford').className = "text-5xl font-black mt-2 text-emerald-400";
-            }
+            document.getElementById('bradford-warning').classList.toggle('hidden', stats.score <= 100);
+            
+            updateFilteredTimeline();
+        }
 
+        function updateFilteredTimeline() {
+            if(!selectedEmployee) return;
+            const targetTimelineRecords = getFilteredAndSortedRecords(selectedEmployee);
             const timeline = document.getElementById('individual-timeline');
             timeline.innerHTML = "";
 
-            if (empRecords.length === 0) {
-                timeline.innerHTML = `<p class="text-center text-gray-500 py-4">No logged records found for this employee.</p>`;
+            if(targetTimelineRecords.length === 0) {
+                timeline.innerHTML = `<p class="text-center text-gray-500 py-4 text-xs">No records found matching current selection parameters.</p>`;
                 return;
             }
 
-            empRecords.forEach(r => {
-                let borderClass = 'border-amber-500 bg-amber-950/20';
-                if (r.type === 'absence') borderClass = 'border-red-500 bg-red-950/20';
-                if (r.type === 'leave') borderClass = 'border-blue-500 bg-blue-950/20';
-                if (r.type === 'late' || r.type === 'early') borderClass = 'border-purple-500 bg-purple-950/20';
-                
+            targetTimelineRecords.forEach(r => {
                 timeline.innerHTML += `
-                    <div class="p-4 rounded-lg border-l-4 ${borderClass}">
-                        <div class="flex justify-between items-start">
-                            <h5 class="text-sm font-bold capitalize text-white">${r.type} Record</h5>
-                            <span class="text-xs text-gray-400 font-semibold">${r.startDate} to ${r.endDate}</span>
-                        </div>
-                        <p class="text-xs text-gray-300 mt-2 leading-relaxed">${r.notes}</p>
-                    </div>
-                `;
+                    <div class="p-3 bg-gray-750/40 rounded-lg border-l-4 border-emerald-500">
+                        <div class="flex justify-between text-xs"><span class="font-bold text-white">[${r.type}] Entry Log</span><span class="text-gray-400 font-semibold">${r.startDate} to ${r.endDate}</span></div>
+                        <p class="text-xs text-gray-300 mt-1">${r.notes}</p>
+                    </div>`;
             });
         }
 
@@ -709,71 +694,39 @@
             document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
             document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
 
-            if (viewId === 'dashboard') {
-                document.getElementById('dashboard-view').classList.remove('hidden');
-                document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-            }
-            if (viewId === 'matrix') {
-                document.getElementById('matrix-view').classList.remove('hidden');
-                document.getElementById('btn-matrix').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-                buildMatrixGrid();
-            }
-            if (viewId === 'calendar') {
-                document.getElementById('calendar-view').classList.remove('hidden');
-                document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-                setTimeout(() => { calendar.updateSize(); }, 50);
-            }
-            if (viewId === 'roster') {
-                document.getElementById('roster-view').classList.remove('hidden');
-                document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-            }
-            if (viewId === 'individual') {
-                document.getElementById('individual-view').classList.remove('hidden');
-            }
+            if (viewId === 'dashboard') { document.getElementById('dashboard-view').classList.remove('hidden'); document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; }
+            if (viewId === 'matrix') { document.getElementById('matrix-view').classList.remove('hidden'); document.getElementById('btn-matrix').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; buildMatrixGrid(); }
+            if (viewId === 'calendar') { document.getElementById('calendar-view').classList.remove('hidden'); document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; setTimeout(() => { calendar.updateSize(); }, 50); }
+            if (viewId === 'roster') { document.getElementById('roster-view').classList.remove('hidden'); document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; }
+            if (viewId === 'individual') { document.getElementById('individual-view').classList.remove('hidden'); }
         }
 
+        // Export Engines integrating dynamic states
         function exportToExcel() {
-            const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
-            const data = empRecords.map(r => ({ Employee: r.employeeName, RecordType: r.type, StartDate: r.startDate, EndDate: r.endDate, Context: r.notes }));
+            const activeDataset = getFilteredAndSortedRecords(selectedEmployee);
+            const data = activeDataset.map(r => ({ Employee: r.employeeName, TypeCode: r.type, Start: r.startDate, End: r.endDate, ContextNotes: r.notes }));
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Logs");
-            XLSX.writeFile(workbook, `${selectedEmployee.replace(/\s+/g, '_')}_Breakdown.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered Logs");
+            XLSX.writeFile(workbook, `${selectedEmployee.replace(/\s+/g, '_')}_Filtered_Data.xlsx`);
         }
 
         function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const profile = teamProfiles[selectedEmployee];
-            const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
-            const stats = calculateBradford(empRecords);
-
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(20);
-            doc.text("Operational Summary Profile Report", 14, 20);
+            const activeDataset = getFilteredAndSortedRecords(selectedEmployee);
             
-            doc.setFontSize(11);
-            doc.setFont("Helvetica", "normal");
-            doc.text(`Employee Name: ${selectedEmployee}`, 14, 32);
-            doc.text(`Assignment Context: ${profile.role} (${profile.crew})`, 14, 39);
-            doc.text(`Primary Driver Tag: ${profile.driver}`, 14, 46);
-            doc.text(`Rolling Bradford Factor Score: ${stats.score} [Spells: ${stats.spells} / Total Days: ${stats.days}]`, 14, 53);
+            doc.setFont("Helvetica", "bold"); doc.setFontSize(16);
+            doc.text(`Filtered Operations Report: ${selectedEmployee}`, 14, 20);
             
-            doc.line(14, 59, 196, 59);
-            let y = 69;
-            doc.setFont("Helvetica", "bold");
-            doc.text("Historical Record Occurrences Timeline:", 14, y);
-            y += 10;
-
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(10);
-            empRecords.forEach((r, i) => {
-                if (y > 270) { doc.addPage(); y = 20; }
-                doc.text(`${i+1}. ${r.type.toUpperCase()}: ${r.startDate} to ${r.endDate}`, 14, y);
-                doc.text(`Details: ${r.notes}`, 14, y + 5);
-                y += 16;
+            doc.setFontSize(10); doc.setFont("Helvetica", "normal");
+            let y = 35;
+            activeDataset.forEach((r, idx) => {
+                if(y > 270) { doc.addPage(); y = 20; }
+                doc.text(`${idx+1}. [${r.type}] ${r.startDate} to ${r.endDate} - Notes: ${r.notes}`, 14, y);
+                y += 12;
             });
-            doc.save(`${selectedEmployee.replace(/\s+/g, '_')}_Report.pdf`);
+            doc.save(`${selectedEmployee.replace(/\s+/g, '_')}_Filtered_Report.pdf`);
         }
 
         function toggleTheme() { return false; }
