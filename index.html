@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpsTracker - Absenteeism & Leave Manager</title>
+    <title>OpsTracker - Team Performance & Leave Manager</title>
     
     <!-- Tailwind CSS with custom configuration for class-based dark mode -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -146,7 +146,6 @@
                                 </tr>
                             </thead>
                             <tbody id="dashboard-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <!-- Loaded dynamically -->
                                 <tr>
                                     <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with Firestore database...</td>
                                 </tr>
@@ -169,18 +168,18 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: TEAM DIRECTORY / PROFILES -->
+            <!-- SECTION 3: TEAM DIRECTORY -->
             <section id="roster-view" class="space-y-6 hidden">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Team Directory</h2>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">Select an employee to see their individual breakdown, Bradford score, or export data.</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Select an employee to view organizational history, core drivers, and operational review metrics.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-list">
                     <!-- Loaded dynamically -->
                 </div>
             </section>
 
-            <!-- SECTION 4: INDIVIDUAL BREAKDOWN REPORT -->
+            <!-- SECTION 4: INDIVIDUAL BREAKDOWN & PROFILE REPORT -->
             <section id="individual-view" class="space-y-6 hidden">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-4">
@@ -189,7 +188,7 @@
                         </button>
                         <div>
                             <h2 id="report-name" class="text-2xl font-bold text-gray-900 dark:text-white">Employee Name</h2>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">Individual Attendance Record & Analytics</p>
+                            <p id="report-role" class="text-gray-500 dark:text-gray-400 text-sm">Role | Crew Assignment</p>
                         </div>
                     </div>
                     <div class="flex gap-3">
@@ -202,6 +201,46 @@
                     </div>
                 </div>
 
+                <!-- Deep Profiling Context Cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Profile Card Details -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3">
+                            <i data-lucide="user" class="text-emerald-500 w-5 h-5"></i>
+                            <h4 class="font-bold text-md text-gray-900 dark:text-white">Personal Profile Details</h4>
+                        </div>
+                        <div>
+                            <span class="text-xs uppercase text-gray-400 block font-bold">Contact Status</span>
+                            <p id="profile-contact" class="text-sm font-medium mt-0.5 text-gray-800 dark:text-gray-200">-</p>
+                        </div>
+                        <div>
+                            <span class="text-xs uppercase text-gray-400 block font-bold">Rostered Shift Setup</span>
+                            <p id="profile-shift" class="text-sm font-medium mt-0.5 text-gray-800 dark:text-gray-200">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Motivation and Core Drivers Card -->
+                    <div class="lg:col-span-2 bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3">
+                            <i data-lucide="compass" class="text-amber-500 w-5 h-5"></i>
+                            <h4 class="font-bold text-md text-gray-900 dark:text-white">Core Workplace Motivation Drivers</h4>
+                        </div>
+                        <div>
+                            <span class="text-xs uppercase text-amber-600 dark:text-amber-400 block font-bold tracking-wider">Primary Driver Tag</span>
+                            <div class="mt-1">
+                                <span id="profile-driver-badge" class="px-2.5 py-1 text-xs font-bold rounded-full border bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900">Driver</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs uppercase text-gray-400 block font-bold">Performance Narrative Context</span>
+                            <p id="profile-driver-desc" class="text-sm font-medium mt-1 text-gray-700 dark:text-gray-300 leading-relaxed">
+                                Analysis description outlining alignment parameters for workplace priorities.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Matrix Block -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
                         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Bradford Factor Score</p>
@@ -220,6 +259,7 @@
                     </div>
                 </div>
 
+                <!-- Personal Records Timeline -->
                 <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                     <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Personal Records Timeline</h4>
                     <div id="individual-timeline" class="space-y-3">
@@ -232,15 +272,15 @@
 
     <!-- MAIN MODAL FOR SUBMISSIONS -->
     <div id="logActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-850">
                 <h3 class="font-bold text-lg text-gray-900 dark:text-white">Log Operational Entry</h3>
-                <button onclick="closeModal('logActionModal')" class="text-gray-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button type="button" onclick="closeModal('logActionModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form id="entryForm" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Select Employee</label>
-                    <select id="form-employee" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 text-sm">
+                    <label class="block text-xs uppercase text-gray-500 dark:text-gray-400 font-bold mb-1.5">Select Employee</label>
+                    <select id="form-employee" required class="w-full bg-gray-50 dark:bg-gray-750 border border-gray-300 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 text-sm">
                         <option value="Emil Tyson">Emil Tyson</option>
                         <option value="Sarah Jenkins">Sarah Jenkins</option>
                         <option value="Michael Scott">Michael Scott</option>
@@ -248,41 +288,41 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Entry Target Type</label>
+                    <label class="block text-xs uppercase text-gray-500 dark:text-gray-400 font-bold mb-1.5">Entry Target Type</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-center">
                             <input type="radio" name="entryType" value="absence" class="sr-only" checked>
-                            <i data-lucide="user-x" class="w-4 h-4 text-red-500"></i>
-                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">Absenteeism</span>
+                            <i data-lucide="user-x" class="w-5 h-5 text-red-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-200 font-semibold mt-1">Absenteeism</span>
                         </label>
-                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-center">
                             <input type="radio" name="entryType" value="leave" class="sr-only">
-                            <i data-lucide="palm-tree" class="w-4 h-4 text-blue-500"></i>
-                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">Annual Leave</span>
+                            <i data-lucide="palm-tree" class="w-5 h-5 text-blue-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-200 font-semibold mt-1">Annual Leave</span>
                         </label>
-                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-750 transition text-center">
+                        <label class="border border-gray-300 dark:border-gray-650 rounded-lg p-3 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition text-center">
                             <input type="radio" name="entryType" value="note" class="sr-only">
-                            <i data-lucide="file-text" class="w-4 h-4 text-amber-500"></i>
-                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium mt-1">File Note</span>
+                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                            <span class="text-xs text-gray-700 dark:text-gray-200 font-semibold mt-1">File Note</span>
                         </label>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label>
-                        <input id="form-start" type="date" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <label class="block text-xs uppercase text-gray-500 dark:text-gray-400 font-bold mb-1.5">Start Date</label>
+                        <input id="form-start" type="date" required class="w-full bg-gray-50 dark:bg-gray-750 border border-gray-300 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">End Date</label>
-                        <input id="form-end" type="date" required class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <label class="block text-xs uppercase text-gray-500 dark:text-gray-400 font-bold mb-1.5">End Date</label>
+                        <input id="form-end" type="date" required class="w-full bg-gray-50 dark:bg-gray-750 border border-gray-300 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Context / Narrative Notes</label>
-                    <textarea id="form-notes" rows="3" required placeholder="Provide clear timeline details..." class="w-full bg-gray-100 dark:bg-gray-750 border border-gray-350 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
+                    <label class="block text-xs uppercase text-gray-500 dark:text-gray-400 font-bold mb-1.5">Context / Narrative Notes</label>
+                    <textarea id="form-notes" rows="3" required placeholder="Provide clear timeline details..." class="w-full bg-gray-50 dark:bg-gray-750 border border-gray-300 dark:border-gray-650 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:border-emerald-500 placeholder-gray-400 dark:placeholder-gray-500"></textarea>
                 </div>
                 <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-300 dark:border-gray-650 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition font-medium">Cancel</button>
+                    <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-300 dark:border-gray-650 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm transition font-medium">Save Entry</button>
                 </div>
             </form>
@@ -295,10 +335,45 @@
         let calendar = null;
         let selectedEmployee = "";
 
-        // List of team members
-        const teamList = ["Emil Tyson", "Sarah Jenkins", "Michael Scott", "Dwight Schrute"];
+        // Core Roster Profile Database containing Personal Details and Drivers
+        const teamProfiles = {
+            "Emil Tyson": {
+                role: "Shift Supervisor",
+                crew: "Crew A",
+                contact: "emil.tyson@factory.com",
+                shift: "Rotating Roster - Day/Night 12h",
+                driver: "Retirement Goal",
+                description: "Focused heavily on long-term wealth stabilization and process alignment. Transitioning systematically to cruise comfortably into retirement within the decade while training up shift updates."
+            },
+            "Sarah Jenkins": {
+                role: "Line Operator",
+                crew: "Crew B",
+                contact: "s.jenkins@factory.com",
+                shift: "Fixed Day Shift",
+                driver: "Family Stability",
+                description: "Driven primarily by supporting dependents at home. Highly values clear consistency, weekend availability protections, and reliable scheduling predictability to balance active home management."
+            },
+            "Michael Scott": {
+                role: "Production Lead",
+                crew: "Crew A",
+                contact: "m.scott@factory.com",
+                shift: "Standard Day Shift",
+                driver: "Travel & Adventure",
+                description: "Uses seasonal operational block breaks to fund personal international travel and holiday cruising. Highly responsive to efficiency performance bonuses that supplement recreational milestones."
+            },
+            "Dwight Schrute": {
+                role: "Logistics Specialist",
+                crew: "Crew C",
+                contact: "d.schrute@factory.com",
+                shift: "Fixed Night Shift",
+                driver: "Financial Optimization",
+                description: "Aggressively maximizes overtime allocations and shift differential premiums. Motivated directly by base revenue optimization, investments, and maximizing operational output targets."
+            }
+        };
 
-        // Initialize Theme preference
+        const teamList = Object.keys(teamProfiles);
+
+        // Theme preference initialization
         const currentTheme = localStorage.getItem('theme') || 'dark';
         if (currentTheme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -312,7 +387,6 @@
             initCalendar();
         });
 
-        // Initialize Dynamic FullCalendar
         function initCalendar() {
             const calendarEl = document.getElementById('calendar-element');
             calendar = new FullCalendar.Calendar(calendarEl, {
@@ -328,7 +402,6 @@
             calendar.render();
         }
 
-        // Wait for Firebase to finish initializing before fetching records
         window.addEventListener('firebase-initialized', () => {
             fetchFirebaseRecords();
         });
@@ -350,11 +423,10 @@
                 renderRoster();
                 updateCalendarEvents();
             } catch (err) {
-                console.error("Failed fetching database documents: ", err);
+                console.error("Database connection fault: ", err);
             }
         }
 
-        // Form Submit Handler (Saves direct to cloud)
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -376,16 +448,13 @@
 
                 closeModal('logActionModal');
                 document.getElementById('entryForm').reset();
-                
-                // Instantly re-query database
                 await fetchFirebaseRecords();
             } catch (error) {
-                console.error("Error writing entry: ", error);
-                alert("Writing failed. Please ensure your Firestore setup rules are correct.");
+                console.error("Firestore submission error: ", error);
+                alert("Writing failed. Please verify your Cloud Firestore database rules are set to open test mode.");
             }
         });
 
-        // Render Dashboard Data Lists
         function renderDashboard() {
             const tbody = document.getElementById('dashboard-table-body');
             tbody.innerHTML = "";
@@ -395,7 +464,7 @@
             let countNotes = 0;
 
             if (allRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No active logs registered in system database.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No active system log entries registered in the cloud database yet.</td></tr>`;
                 return;
             }
 
@@ -404,16 +473,16 @@
                 if (record.type === 'leave') countLeave++;
                 if (record.type === 'note') countNotes++;
 
-                const typeColor = record.type === 'absence' ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400' :
-                                  record.type === 'leave' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400' : 
-                                  'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400';
+                const typeColor = record.type === 'absence' ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900' :
+                                  record.type === 'leave' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900' : 
+                                  'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900';
 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-gray-100 dark:hover:bg-gray-750 border-b border-gray-200 dark:border-gray-700 cursor-pointer";
                 row.onclick = () => viewIndividualReport(record.employeeName);
                 row.innerHTML = `
                     <td class="px-4 py-3 text-gray-900 dark:text-white font-medium">${record.employeeName}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs ${typeColor}">${record.type}</span></td>
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs font-semibold ${typeColor}">${record.type}</span></td>
                     <td class="px-4 py-3 text-xs">${record.startDate} to ${record.endDate}</td>
                     <td class="px-4 py-3 text-xs truncate max-w-xs text-gray-500 dark:text-gray-400">${record.notes}</td>
                 `;
@@ -425,12 +494,12 @@
             document.getElementById('stat-notes').innerText = countNotes;
         }
 
-        // Render Roster & Bradford factor cards
         function renderRoster() {
             const rosterContainer = document.getElementById('roster-list');
             rosterContainer.innerHTML = "";
 
             teamList.forEach(name => {
+                const profile = teamProfiles[name];
                 const empRecords = allRecords.filter(r => r.employeeName === name);
                 const stats = calculateBradford(empRecords);
 
@@ -440,15 +509,20 @@
                 
                 card.innerHTML = `
                     <div>
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white">${name}</h4>
-                        <p class="text-xs text-gray-400">Team Member</p>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white">${name}</h4>
+                                <p class="text-xs text-gray-400">${profile.role} | ${profile.crew}</p>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">${profile.driver}</span>
+                        </div>
                         
                         <div class="mt-4 flex justify-between items-center bg-white dark:bg-gray-700/30 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                             <span class="text-xs text-gray-400">Bradford Factor:</span>
-                            <span class="text-md font-bold ${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
+                            <span class="text-md font-bold ${stats.score > 100 ? 'text-red-400' : 'text-emerald-500'}">${stats.score}</span>
                         </div>
                     </div>
-                    <div class="mt-4 text-xs text-gray-400 flex justify-between">
+                    <div class="mt-4 text-xs text-gray-400 flex justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                         <span>${stats.spells} Absence spells</span>
                         <span>${stats.days} Days lost</span>
                     </div>
@@ -457,8 +531,6 @@
             });
         }
 
-        // Calculate Bradford Factor Score
-        // Formula: S² x D = Score (S: spells of sickness, D: total absence days)
         function calculateBradford(records) {
             const absences = records.filter(r => r.type === 'absence');
             const spells = absences.length;
@@ -472,22 +544,16 @@
                 days += diffDays;
             });
 
-            return {
-                spells: spells,
-                days: days,
-                score: (spells * spells) * days
-            };
+            return { spells: spells, days: days, score: (spells * spells) * days };
         }
 
-        // Feed Firestore records to FullCalendar
         function updateCalendarEvents() {
             if (!calendar) return;
             const events = allRecords.map(r => {
-                let color = '#3b82f6'; // blue for leave
-                if (r.type === 'absence') color = '#ef4444'; // red
-                if (r.type === 'note') color = '#f59e0b'; // amber
+                let color = '#3b82f6'; 
+                if (r.type === 'absence') color = '#ef4444'; 
+                if (r.type === 'note') color = '#f59e0b'; 
 
-                // Increment end date by 1 day because FullCalendar excludes end date in multi-day events
                 let endDateObj = new Date(r.endDate);
                 endDateObj.setDate(endDateObj.getDate() + 1);
                 const formattedEndDate = endDateObj.toISOString().split('T')[0];
@@ -503,16 +569,23 @@
             calendar.addEventSource(events);
         }
 
-        // Show Individual Personal report breakdown
         function viewIndividualReport(name) {
             selectedEmployee = name;
             switchTab('individual');
 
-            document.getElementById('report-name').innerText = name;
-            
+            const profile = teamProfiles[name];
             const empRecords = allRecords.filter(r => r.employeeName === name);
             const stats = calculateBradford(empRecords);
 
+            // Populate Profile Data Fields
+            document.getElementById('report-name').innerText = name;
+            document.getElementById('report-role').innerText = `${profile.role} | ${profile.crew}`;
+            document.getElementById('profile-contact').innerText = profile.contact;
+            document.getElementById('profile-shift').innerText = profile.shift;
+            document.getElementById('profile-driver-badge').innerText = profile.driver;
+            document.getElementById('profile-driver-desc').innerText = profile.description;
+
+            // Populate Stats Cards
             document.getElementById('report-bradford').innerText = stats.score;
             document.getElementById('report-spells').innerText = stats.spells;
             document.getElementById('report-days').innerText = stats.days;
@@ -529,35 +602,33 @@
             timeline.innerHTML = "";
 
             if (empRecords.length === 0) {
-                timeline.innerHTML = `<p class="text-center text-gray-500 py-4">No logged occurrences found for this individual.</p>`;
+                timeline.innerHTML = `<p class="text-center text-gray-500 py-4">No structural log records found for this employee profile.</p>`;
                 return;
             }
 
             empRecords.forEach(r => {
-                const borderClass = r.type === 'absence' ? 'border-red-500 bg-red-100 dark:bg-red-950/20' :
-                                    r.type === 'leave' ? 'border-blue-500 bg-blue-100 dark:bg-blue-950/20' : 
-                                    'border-amber-500 bg-amber-100 dark:bg-amber-950/20';
+                const borderClass = r.type === 'absence' ? 'border-red-500 bg-red-100 dark:bg-red-950/20 text-gray-900 dark:text-gray-100' :
+                                    r.type === 'leave' ? 'border-blue-500 bg-blue-100 dark:bg-blue-950/20 text-gray-900 dark:text-gray-100' : 
+                                    'border-amber-500 bg-amber-100 dark:bg-amber-950/20 text-gray-900 dark:text-gray-100';
                 
                 timeline.innerHTML += `
                     <div class="p-4 rounded-lg border-l-4 ${borderClass}">
                         <div class="flex justify-between items-start">
-                            <h5 class="text-sm font-bold capitalize text-gray-900 dark:text-white">${r.type} Record</h5>
-                            <span class="text-xs text-gray-400">${r.startDate} to ${r.endDate}</span>
+                            <h5 class="text-sm font-bold capitalize text-gray-900 dark:text-white">${r.type} Log Entry</h5>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 font-semibold">${r.startDate} to ${r.endDate}</span>
                         </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-300 mt-2">${r.notes}</p>
+                        <p class="text-xs text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">${r.notes}</p>
                     </div>
                 `;
             });
         }
 
-        // UI View Tab Swapper
         function switchTab(viewId) {
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('calendar-view').classList.add('hidden');
             document.getElementById('roster-view').classList.add('hidden');
             document.getElementById('individual-view').classList.add('hidden');
 
-            // Reset navigation tab selection backgrounds
             document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
             document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
             document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition";
@@ -569,7 +640,7 @@
             if (viewId === 'calendar') {
                 document.getElementById('calendar-view').classList.remove('hidden');
                 document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-                setTimeout(() => { calendar.updateSize(); }, 50); // Refresh calendar sizing on render
+                setTimeout(() => { calendar.updateSize(); }, 50);
             }
             if (viewId === 'roster') {
                 document.getElementById('roster-view').classList.remove('hidden');
@@ -580,7 +651,6 @@
             }
         }
 
-        // Export To Excel
         function exportToExcel() {
             const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
             const data = empRecords.map(r => ({
@@ -593,32 +663,33 @@
             
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Logs");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Logs");
             XLSX.writeFile(workbook, `${selectedEmployee.replace(/\s+/g, '_')}_Breakdown.xlsx`);
         }
 
-        // Export To PDF Document
         function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            const profile = teamProfiles[selectedEmployee];
             const empRecords = allRecords.filter(r => r.employeeName === selectedEmployee);
             const stats = calculateBradford(empRecords);
 
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(20);
-            doc.text("Attendance Summary Report", 14, 20);
+            doc.text("Operational Summary Profile Report", 14, 20);
             
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont("Helvetica", "normal");
             doc.text(`Employee Name: ${selectedEmployee}`, 14, 32);
-            doc.text(`Rolling Bradford Factor Score: ${stats.score}`, 14, 40);
-            doc.text(`Absence Spells: ${stats.spells}  |  Total Calendar Days Off: ${stats.days}`, 14, 48);
+            doc.text(`Assignment Context: ${profile.role} (${profile.crew})`, 14, 39);
+            doc.text(`Primary Driver Tag: ${profile.driver}`, 14, 46);
+            doc.text(`Rolling Bradford Factor Score: ${stats.score} [Spells: ${stats.spells} / Total Days: ${stats.days}]`, 14, 53);
             
-            doc.line(14, 54, 196, 54); // Horizontal line divider
+            doc.line(14, 59, 196, 59);
             
-            let y = 64;
+            let y = 69;
             doc.setFont("Helvetica", "bold");
-            doc.text("Timeline Log Entries:", 14, y);
+            doc.text("Historical Record Occurrences Timeline:", 14, y);
             y += 10;
 
             doc.setFont("Helvetica", "normal");
@@ -626,14 +697,13 @@
             empRecords.forEach((r, i) => {
                 if (y > 270) { doc.addPage(); y = 20; }
                 doc.text(`${i+1}. ${r.type.toUpperCase()}: ${r.startDate} to ${r.endDate}`, 14, y);
-                doc.text(`Notes: ${r.notes}`, 14, y + 6);
-                y += 18;
+                doc.text(`Details: ${r.notes}`, 14, y + 5);
+                y += 16;
             });
 
             doc.save(`${selectedEmployee.replace(/\s+/g, '_')}_Report.pdf`);
         }
 
-        // Dark/Light Theme State Handlers
         function toggleTheme() {
             const isDark = document.documentElement.classList.contains('dark');
             const newTheme = isDark ? 'light' : 'dark';
@@ -659,7 +729,6 @@
             lucide.createIcons();
         }
 
-        // Modal Helpers
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     </script>
