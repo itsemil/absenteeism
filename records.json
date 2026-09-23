@@ -1,0 +1,10 @@
+{
+  "id": "rec_xyz123",
+  "employeeId": "emp_001",
+  "type": "Absence", // Absence, Annual Leave, File Note
+  "startDate": "2026-07-15",
+  "endDate": "2026-07-16",
+  "reason": "Unplanned Sick Leave",
+  "notes": "Called in 2 hours before shift.",
+  "timestamp": "2026-07-15T23:00:00Z"
+}

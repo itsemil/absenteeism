@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpsTracker - Team Performance & Leave Manager</title>
+    <title>OpsTracker - Attendance & Operations Center</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
+        tailwind.config = { darkMode: 'class' };
     </script>
     
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -23,16 +21,191 @@
         .fc { --fc-border-color: #374151; --fc-page-bg-color: transparent; }
         .dark .fc-theme-standard td, .dark .fc-theme-standard th { border-color: #374151; }
         .dark .fc-col-header-cell { background-color: #1f2937; color: #f3f4f6; }
-        .fc-event { cursor: pointer; border-radius: 4px; padding: 2px 4px; }
+        .fc-event { cursor: pointer; border-radius: 4px; padding: 2px 4px; font-weight: 600; font-size: 0.75rem; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-        .sticky-col-left { position: sticky; left: 0; z-index: 10; }
-        .sticky-col-right { position: sticky; right: 0; z-index: 10; }
+
+        .fc .fc-day-today {
+            background-color: rgba(5, 150, 105, 0.18) !important;
+            border: 2px solid #10b981 !important;
+        }
+        .fc .fc-day-today .fc-daygrid-day-number {
+            background-color: #10b981;
+            color: #ffffff !important;
+            font-weight: 800;
+            border-radius: 9999px;
+            padding: 2px 6px;
+            margin: 2px;
+        }
+
+        .fc .fc-button-primary {
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+            text-transform: capitalize;
+            font-weight: 600;
+        }
+        .fc .fc-button-primary:hover { background-color: #4b5563 !important; }
+        .fc .fc-today-button {
+            background-color: #059669 !important;
+            border-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        /* =========================================================
+           SKILLS MATRIX: BULLETPROOF DUAL-AXIS STICKY HEADERS
+           ========================================================= */
+        .skills-scroll-container {
+            overflow: auto;
+            max-height: 72vh;
+            position: relative;
+        }
+        .skills-table {
+            border-separate: separate;
+            border-spacing: 0;
+        }
+        /* Top Row Sticky Headers */
+        .sticky-skills-th {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+        }
+        /* Top-Left Corners: Intersection of pinned column & pinned row */
+        .sticky-skills-corner-pos {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 240px;
+            min-width: 240px;
+            max-width: 240px;
+            z-index: 50;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+            border-right: 1px solid #374151;
+        }
+        .sticky-skills-corner-name {
+            position: sticky;
+            top: 0;
+            left: 240px;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            z-index: 50;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+            border-right: 1px solid #374151;
+            box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+        /* Body Left-Side Sticky Columns */
+        .sticky-skills-pos {
+            position: sticky;
+            left: 0;
+            width: 240px;
+            min-width: 240px;
+            max-width: 240px;
+            z-index: 20;
+            background-color: #1f2937 !important;
+            border-right: 1px solid #374151;
+        }
+        .sticky-skills-name {
+            position: sticky;
+            left: 240px;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            z-index: 20;
+            background-color: #1f2937 !important;
+            border-right: 1px solid #374151;
+            box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* =========================================================
+           ATTENDANCE MATRIX: BULLETPROOF DUAL-AXIS STICKY HEADERS
+           ========================================================= */
+        .matrix-scroll-container {
+            overflow: auto;
+            max-height: 72vh;
+            position: relative;
+        }
+        .matrix-table {
+            border-separate: separate;
+            border-spacing: 0;
+        }
+        /* Top Row Sticky Headers (Dates) */
+        .sticky-matrix-th {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+        }
+        /* Top-Left Corner: Employee Column Header */
+        .sticky-matrix-corner-name {
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 50;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+            border-right: 1px solid #374151;
+            box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+        /* Top-Right Corner: Totals Column Header */
+        .sticky-matrix-corner-right {
+            position: sticky;
+            top: 0;
+            right: 0;
+            z-index: 50;
+            background-color: #111827 !important;
+            border-bottom: 2px solid #4b5563;
+            border-left: 1px solid #374151;
+            box-shadow: -4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+        /* Body Left-Side Sticky Column (Employee Name) */
+        .sticky-col-matrix-name { 
+            position: sticky; 
+            left: 0; 
+            z-index: 20; 
+            background-color: #1f2937 !important;
+            border-right: 1px solid #374151;
+            box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+        /* Body Right-Side Sticky Column (Totals) */
+        .sticky-col-right { 
+            position: sticky; 
+            right: 0; 
+            z-index: 15; 
+            background-color: #1f2937 !important;
+            border-left: 1px solid #374151;
+            box-shadow: -4px 0 6px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Inputs & Form Contrasts */
+        input[type="text"], input[type="email"], input[type="date"], textarea, select {
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+        }
+        input::placeholder, textarea::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+        select option { background-color: #1f2937 !important; color: #f9fafb !important; }
+
+        @media print {
+            body { background-color: #ffffff !important; color: #000000 !important; }
+            aside, nav, button, #manning-dropzone, #manning-nav-bar, .no-print { display: none !important; }
+            main { padding: 0 !important; overflow: visible !important; width: 100% !important; }
+            #manning-view { display: block !important; }
+            .manning-board-container { border: 2px solid #000000 !important; background: #ffffff !important; color: #000000 !important; }
+            .manning-station-box { border: 1px solid #333333 !important; color: #000000 !important; }
+            .manning-badge { border: 1px solid #000000 !important; color: #000000 !important; background: #e5e7eb !important; }
+            @page { size: landscape; margin: 8mm; }
+        }
     </style>
 
     <!-- FIREBASE MODULE SYSTEM -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmnYLrkActmDa0Y2WIvy2qdASvi1glMHM",
@@ -47,7 +220,7 @@
         const db = getFirestore(app);
 
         window.db = db;
-        window.firestoreUtils = { collection, addDoc, getDocs, query, orderBy };
+        window.firestoreUtils = { collection, addDoc, getDocs, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc };
         window.dispatchEvent(new Event('firebase-initialized'));
     </script>
 </head>
@@ -55,7 +228,7 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-gray-800 border-r border-gray-700 p-6 flex flex-col justify-between">
+        <aside class="w-64 bg-gray-800 border-r border-gray-700 p-6 flex flex-col justify-between no-print">
             <div>
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
@@ -67,11 +240,17 @@
                     <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition" id="btn-dashboard">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
                     </button>
+                    <button onclick="switchTab('manning')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-manning">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i> Manning Plan
+                    </button>
                     <button onclick="switchTab('matrix')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-matrix">
                         <i data-lucide="grid" class="w-5 h-5"></i> Attendance Matrix
                     </button>
                     <button onclick="switchTab('calendar')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-calendar">
                         <i data-lucide="calendar" class="w-5 h-5"></i> Team Calendar
+                    </button>
+                    <button onclick="switchTab('skills')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-skills">
+                        <i data-lucide="wrench" class="w-5 h-5"></i> Skills Matrix
                     </button>
                     <button onclick="switchTab('roster')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition" id="btn-roster">
                         <i data-lucide="users" class="w-5 h-5"></i> Team Directory
@@ -94,43 +273,45 @@
             
             <!-- SECTION 1: DASHBOARD -->
             <section id="dashboard-view" class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white">Operations Overview</h2>
-                        <p class="text-gray-400 text-sm">Real-time attendance logs and action triggers.</p>
-                    </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Operations Overview</h2>
+                    <p class="text-gray-400 text-sm">Real-time attendance logs and action triggers.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <p class="text-sm text-gray-400 font-medium">Unplanned Sickness Events</p>
+                        <p class="text-sm text-gray-400 font-medium">Unplanned Sickness / WC</p>
                         <h3 id="stat-absences" class="text-3xl font-bold mt-1 text-red-400">0</h3>
                     </div>
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <p class="text-sm text-gray-400 font-medium">Approved Annual Leave Blocks</p>
+                        <p class="text-sm text-gray-400 font-medium">Approved Annual Leave (AL)</p>
                         <h3 id="stat-leave" class="text-3xl font-bold mt-1 text-blue-400">0</h3>
                     </div>
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <p class="text-sm text-gray-400 font-medium">Official File Notes Logged</p>
+                        <p class="text-sm text-gray-400 font-medium">Offsite / Courses (OS)</p>
+                        <h3 id="stat-offsite" class="text-3xl font-bold mt-1 text-cyan-400">0</h3>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                        <p class="text-sm text-gray-400 font-medium">Official File Notes (FN)</p>
                         <h3 id="stat-notes" class="text-3xl font-bold mt-1 text-amber-400">0</h3>
                     </div>
                 </div>
 
                 <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                    <h4 class="text-lg font-semibold mb-4 text-white">Recent Exceptions Log</h4>
+                    <h4 class="text-lg font-semibold mb-4 text-white">Recent Shift Exceptions Log</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-gray-400">
                             <thead class="text-xs uppercase bg-gray-700 text-gray-300">
                                 <tr>
                                     <th class="px-4 py-3">Employee</th>
-                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3">Code</th>
                                     <th class="px-4 py-3">Date Range</th>
                                     <th class="px-4 py-3">Notes</th>
                                 </tr>
                             </thead>
                             <tbody id="dashboard-table-body" class="divide-y divide-gray-700">
                                 <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with Cloud Firestore database...</td>
+                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">Syncing with database...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -138,50 +319,333 @@
                 </div>
             </section>
 
-            <!-- SECTION 2: GRID MATRIX -->
-            <section id="matrix-view" class="space-y-6 hidden">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 id="matrix-month-heading" class="text-2xl font-bold text-white">Monthly Roster Matrix</h2>
-                        <p class="text-gray-400 text-sm">Click any grid cell to log entries or review details.</p>
+            <!-- SECTION 2: FACTORY MANNING PLAN -->
+            <section id="manning-view" class="space-y-6 hidden">
+                <div class="flex flex-wrap items-center justify-between gap-4 no-print" id="manning-nav-bar">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-600 text-white font-extrabold px-4 py-2 rounded-lg text-center leading-tight shadow">
+                            <span class="text-xs tracking-wider uppercase block">Afternoon Shift</span>
+                            <span id="manning-headcount-badge" class="text-lg">0 On-Shift</span>
+                        </div>
+                        <div>
+                            <h2 id="manning-date-heading" class="text-xl font-bold text-white">Date</h2>
+                            <p class="text-xs text-gray-400">Floor Manning Board & Machine Run Schedule</p>
+                        </div>
                     </div>
-                    <div class="flex items-center bg-gray-800 border border-gray-700 p-1.5 rounded-lg gap-2">
-                        <button onclick="navigateMatrixMonth(-1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                        <button onclick="jumpToCurrentMatrixMonth()" class="px-3 py-1 bg-gray-700 hover:bg-gray-650 text-white text-xs font-bold rounded-md transition">Today</button>
-                        <button onclick="navigateMatrixMonth(1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+
+                    <div class="flex items-center bg-gray-800 border border-gray-700 p-1.5 rounded-lg gap-2 shadow">
+                        <button onclick="navigateManningDate(-1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition" title="Previous Day">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <input type="date" id="manning-date-picker" onchange="changeManningDateManual()" class="bg-gray-750 text-xs px-2 py-1 rounded text-white border-0 font-semibold focus:outline-none">
+                        <button onclick="jumpManningToToday()" class="px-3 py-1 bg-gray-700 hover:bg-gray-650 text-white text-xs font-bold rounded-md transition">Today</button>
+                        <button onclick="navigateManningDate(1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition" title="Next Day">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <label id="manning-dropzone" class="border-2 border-dashed border-emerald-500/70 hover:border-emerald-400 bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-300 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-semibold cursor-pointer transition">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                            <span id="dropzone-label">Drop Times Spreadsheet</span>
+                            <input type="file" id="times-spreadsheet-input" accept=".xlsx, .xls" class="hidden" onchange="handleTimesSpreadsheet(this.files)">
+                        </label>
+                        <button onclick="window.print()" class="px-3.5 py-2 bg-gray-750 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs font-bold text-white flex items-center gap-2 transition shadow">
+                            <i data-lucide="printer" class="w-4 h-4 text-emerald-400"></i> Print Shift Plan
+                        </button>
                     </div>
                 </div>
 
-                <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl">
-                    <div class="overflow-x-auto max-w-full">
-                        <table class="w-full text-left border-collapse text-xs text-gray-300">
-                            <thead class="bg-gray-855 border-b border-gray-700">
-                                <tr id="matrix-header-row"></tr>
-                            </thead>
-                            <tbody id="matrix-body-rows" class="divide-y divide-gray-700 bg-gray-800"></tbody>
-                        </table>
+                <div class="bg-gray-850 manning-board-container border border-gray-700 rounded-xl p-6 shadow-2xl space-y-6">
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-red-600 text-white font-black px-4 py-2 rounded-lg text-sm uppercase">
+                                Afternoon Shift - <span id="print-headcount">0</span>
+                            </div>
+                            <h3 id="print-date-display" class="text-xl font-black text-white">Date</h3>
+                        </div>
+                        <div class="text-xs text-gray-400 text-right">
+                            <span id="spreadsheet-sync-status" class="text-emerald-400 font-semibold">Shift Times Loaded</span>
+                        </div>
+                    </div>
+
+                    <!-- FLOOR TOP ROW -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <div class="lg:col-span-3 space-y-3">
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <span class="text-[11px] font-black uppercase text-gray-400 block mb-1">Tooling</span>
+                                <div id="station-tooling" class="min-h-[38px] flex flex-wrap gap-1.5"></div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <span class="text-[11px] font-black uppercase text-gray-400 block mb-1">Inks</span>
+                                <div id="station-inks" class="min-h-[38px] flex flex-wrap gap-1.5"></div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-[11px] font-black uppercase text-gray-400">Baler</span>
+                                    <span id="time-baler" class="text-[10px] text-emerald-400 font-bold">Peter 1530</span>
+                                </div>
+                                <div id="station-baler" class="min-h-[38px] flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </div>
+
+                        <!-- BHS Corrugator Complex -->
+                        <div class="lg:col-span-9 bg-gray-800/80 manning-station-box border border-gray-700 rounded-lg p-4 space-y-3">
+                            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+                                    <h4 class="font-extrabold text-sm text-white uppercase tracking-wider">BHS Corrugator</h4>
+                                </div>
+                                <div class="text-xs bg-gray-750 px-3 py-1 rounded border border-gray-650">
+                                    <span class="text-gray-400">Run Time:</span>
+                                    <strong id="time-corrugator" class="text-emerald-400 font-bold ml-1">Approx. 11pm (Clean 1hr)</strong>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Control Room</span><div id="station-corr-control" class="space-y-1.5 min-h-[50px]"></div></div>
+                                <div><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Wet End</span><div id="station-corr-wet" class="space-y-1.5 min-h-[50px]"></div></div>
+                                <div><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Stackers</span><div id="station-corr-stackers" class="space-y-1.5 min-h-[50px]"></div></div>
+                                <div><span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Grab Operator</span><div id="station-corr-grab" class="space-y-1.5 min-h-[50px]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FLOOR MIDDLE ROW -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="space-y-3">
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Gopfert 1</span><span id="time-gopfert-1" class="text-[10px] text-emerald-400 font-bold">2pm - 11pm</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeder:</span><div id="station-g1-feeder" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Middle:</span><div id="station-g1-middle" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-g1-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Gopfert 2</span><span id="time-gopfert-2" class="text-[10px] text-emerald-400 font-bold">2pm - 11pm</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeder:</span><div id="station-g2-feeder" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Middle:</span><div id="station-g2-middle" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-g2-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Gopfert 3</span><span id="time-gopfert-3" class="text-[10px] text-emerald-400 font-bold">2pm - 11pm</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeder:</span><div id="station-g3-feeder" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Middle:</span><div id="station-g3-middle" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-g3-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Bobst Masterfold</span><span id="time-bobst" class="text-[10px] text-emerald-400 font-bold">2pm - 10pm</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeders:</span><div id="station-bobst-feeders" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-bobst-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Emba 175</span><span id="time-emba-175" class="text-[10px] text-emerald-400 font-bold">2pm - 1am</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeder:</span><div id="station-e175-feeder" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Middle:</span><div id="station-e175-middle" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-e175-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black uppercase text-white">Emba 245</span><span id="time-emba-245" class="text-[10px] text-emerald-400 font-bold">2pm - 1am</span></div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Feeder:</span><div id="station-e245-feeder" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Middle:</span><div id="station-e245-middle" class="flex-1"></div></div>
+                                    <div class="flex items-center gap-1"><span class="w-16 text-[10px] text-gray-400 font-bold">Operator:</span><div id="station-e245-operator" class="flex-1"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <span class="text-xs font-black uppercase text-white block mb-1">Strapping Line</span>
+                                <div id="station-strapping" class="min-h-[50px] flex flex-wrap gap-1.5"></div>
+                            </div>
+                            <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                                <span class="text-xs font-black uppercase text-emerald-400 block mb-1">Shift Floaters / Unassigned</span>
+                                <div id="station-floaters" class="min-h-[60px] flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FLOOR BOTTOM ROW -->
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-3 pt-3 border-t border-gray-700">
+                        <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                            <span class="text-[11px] font-black uppercase text-amber-400 block mb-1">Supervisors</span>
+                            <div id="station-supervisors" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                            <span class="text-[11px] font-black uppercase text-emerald-400 block mb-1">Training</span>
+                            <div id="station-training" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <div class="bg-gray-800 manning-station-box border border-gray-700 rounded-lg p-3">
+                            <span class="text-[11px] font-black uppercase text-orange-400 block mb-1">PEM's</span>
+                            <div id="station-pems" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <div class="bg-blue-950/30 manning-station-box border border-blue-900/60 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] font-black uppercase text-blue-400">Annual Leave</span>
+                                <span id="count-leave-pool" class="text-[10px] text-blue-300 font-bold">0</span>
+                            </div>
+                            <div id="station-leave-pool" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <div class="bg-red-950/30 manning-station-box border border-red-900/60 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] font-black uppercase text-red-400">Absent (SL/CL/WC)</span>
+                                <span id="count-absent-pool" class="text-[10px] text-red-300 font-bold">0</span>
+                            </div>
+                            <div id="station-absent-pool" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <div class="bg-cyan-950/30 manning-station-box border border-cyan-900/60 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] font-black uppercase text-cyan-400">Offsite / Courses</span>
+                                <span id="count-offsite-pool" class="text-[10px] text-cyan-300 font-bold">0</span>
+                            </div>
+                            <div id="station-offsite-pool" class="min-h-[40px] flex flex-wrap gap-1.5"></div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 3: CALENDAR -->
+            <!-- SECTION 3: ATTENDANCE MATRIX -->
+            <section id="matrix-view" class="space-y-6 hidden">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 id="matrix-month-heading" class="text-2xl font-bold text-white">Monthly Attendance Matrix</h2>
+                        <p class="text-gray-400 text-sm">Today's active leaves & absences auto-grouped at top. Full working weeks displayed.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2 bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-lg">
+                            <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            <span class="text-xs text-gray-400 font-semibold">Sort Roster By:</span>
+                            <select id="matrix-sort-by" onchange="buildMatrixGrid()" class="rounded px-2 py-1 text-xs focus:outline-none font-bold">
+                                <option value="today-first">Today's Active Exceptions First (Default)</option>
+                                <option value="az">Name: A to Z</option>
+                                <option value="za">Name: Z to A</option>
+                                <option value="machine">Machine / Factory Position</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center bg-gray-800 border border-gray-700 p-1.5 rounded-lg gap-2">
+                            <button onclick="navigateMatrixMonth(-1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                            <button onclick="jumpToCurrentMatrixMonth()" class="px-3 py-1 bg-gray-700 hover:bg-gray-650 text-white text-xs font-bold rounded-md transition">Today</button>
+                            <button onclick="navigateMatrixMonth(1)" class="p-2 bg-gray-700 hover:bg-gray-650 text-white rounded-md transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/80 border border-gray-700 px-4 py-2.5 rounded-lg flex flex-wrap items-center gap-4 text-xs text-gray-300">
+                    <span class="font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-emerald-400"></i> Legend:</span>
+                    <span><strong class="text-blue-400">AL</strong> = Annual Leave</span>
+                    <span><strong class="text-cyan-400">OS</strong> = Offsite / Course</span>
+                    <span><strong class="text-pink-400">WC</strong> = Work Cover</span>
+                    <span><strong class="text-red-400">SL</strong> = Sick Leave</span>
+                    <span><strong class="text-orange-400">CL</strong> = Carers Leave</span>
+                    <span><strong class="text-purple-400">LI</strong> = Late In</span>
+                    <span><strong class="text-violet-400">LE</strong> = Left Early</span>
+                    <span><strong class="text-amber-400">FN</strong> = File Note</span>
+                    <span class="ml-auto flex items-center gap-1.5 text-amber-400 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Orange Header & Column = Weekend (S / S)</span>
+                </div>
+
+                <!-- SINGLE UNIFIED SCROLL CONTAINER (Guarantees Sticky Works) -->
+                <div class="matrix-scroll-container bg-gray-800 border border-gray-700 rounded-xl shadow-xl">
+                    <table class="matrix-table w-full text-left text-xs text-gray-300">
+                        <thead>
+                            <tr id="matrix-header-row"></tr>
+                        </thead>
+                        <tbody id="matrix-body-rows" class="divide-y divide-gray-700 bg-gray-800"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 4: CALENDAR VIEW -->
             <section id="calendar-view" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Attendance Calendar</h2>
+                        <p class="text-gray-400 text-sm">Today's date is highlighted with an emerald border. Click any entry to inspect or edit details.</p>
+                    </div>
+                    <button onclick="calendar.today();" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow">
+                        <i data-lucide="crosshair" class="w-4 h-4"></i> Jump to Today
+                    </button>
+                </div>
+
                 <div class="bg-gray-800 border border-gray-700 rounded-xl p-6"><div id="calendar-element"></div></div>
             </section>
 
-            <!-- SECTION 4: DIRECTORY -->
+            <!-- SECTION 5: SKILLS MATRIX -->
+            <section id="skills-view" class="space-y-6 hidden">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Factory Floor Skills Matrix</h2>
+                    <p class="text-gray-400 text-sm">Top row and worker columns are frozen for smooth vertical and horizontal navigation.</p>
+                </div>
+
+                <!-- SINGLE UNIFIED SCROLL CONTAINER (Guarantees Sticky Works) -->
+                <div class="skills-scroll-container bg-gray-800 border border-gray-700 rounded-xl shadow-xl">
+                    <table class="skills-table w-full text-left text-xs text-gray-300 whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 sticky-skills-corner-pos text-white font-bold">Factory Position</th>
+                                <th class="px-4 py-3 sticky-skills-corner-name text-white font-bold">Team Member</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Ascor Corpal</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Gopfert</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Pizza Bagger</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Scoring Unit</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Gopfert Set-ups</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Gopfert Feeder</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 245</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 245 Set-ups</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 245 Feeder</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 175</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 175 Set-ups</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Emba 175 Feeder</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Bobst</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Bobst Feeder</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Strappers</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Wrappers</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">E80's</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">Baler</th>
+                                <th class="px-3 py-3 font-semibold text-center border-r border-gray-700 sticky-skills-th">BCM</th>
+                                <th class="px-3 py-3 font-semibold text-center sticky-skills-th">Inks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skills-body-rows" class="divide-y divide-gray-700 bg-gray-800"></tbody>
+                        <tfoot id="skills-foot-rows" class="bg-gray-855 border-t-2 border-gray-600 font-medium"></tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 6: TEAM DIRECTORY -->
             <section id="roster-view" class="space-y-6 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-list"></div>
             </section>
 
-            <!-- SECTION 5: PROFILE OVERVIEW -->
+            <!-- SECTION 7: INDIVIDUAL PROFILE REPORT -->
             <section id="individual-view" class="space-y-6 hidden">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         <button onclick="switchTab('roster')" class="p-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-400 transition"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <div>
-                            <h2 id="report-name" class="text-2xl font-bold text-white">Employee Name</h2>
-                            <p id="report-role" class="text-gray-400 text-sm">-</p>
+                            <div class="flex items-center gap-3">
+                                <h2 id="report-name" class="text-2xl font-bold text-white">Employee Name</h2>
+                                <button onclick="openEditCurrentProfileModal()" class="px-2.5 py-1 bg-gray-750 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs font-semibold text-emerald-400 flex items-center gap-1.5 transition">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit Profile
+                                </button>
+                            </div>
+                            <p id="report-role" class="text-gray-400 text-sm mt-0.5">-</p>
                         </div>
                     </div>
                     <div class="flex gap-3">
@@ -193,33 +657,33 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-4">
                         <h4 class="font-bold text-md text-white border-b border-gray-700 pb-2">Personal Details</h4>
-                        <div><span class="text-xs text-gray-400 block">Contact Status</span><p id="profile-contact" class="text-sm font-medium text-gray-200">-</p></div>
+                        <div><span class="text-xs text-gray-400 block">Contact</span><p id="profile-contact" class="text-sm font-medium text-gray-200">-</p></div>
                         <div><span class="text-xs text-gray-400 block">Shift Setup</span><p id="profile-shift" class="text-sm font-medium text-gray-200">-</p></div>
                     </div>
                     <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-4">
                         <h4 class="font-bold text-md text-white border-b border-gray-700 pb-2">Workplace Motivation</h4>
                         <div><span id="profile-driver-badge" class="px-2.5 py-1 text-xs font-bold rounded-full border bg-amber-950/40 text-amber-300 border-amber-900">-</span></div>
-                        <p id="profile-driver-desc" class="text-sm text-gray-300 mt-2">-</p>
+                        <p id="profile-driver-desc" class="text-sm text-gray-300 mt-2 leading-relaxed">-</p>
                     </div>
                 </div>
 
-                <!-- NEW COMPONENT: TIMELINE FILTER MODIFIERS -->
                 <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-wrap items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4">
-                        <span class="text-xs uppercase font-bold text-gray-400 tracking-wider">Multi-Select Categories:</span>
+                        <span class="text-xs uppercase font-bold text-gray-400 tracking-wider">Multi-Select Filter:</span>
                         <div class="flex flex-wrap gap-3">
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="AL" class="filter-chk accent-emerald-500"> AL</label>
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="SL" class="filter-chk accent-emerald-500"> SL</label>
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="CL" class="filter-chk accent-emerald-500"> CL</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="WC" class="filter-chk accent-emerald-500"> WC</label>
+                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="OS" class="filter-chk accent-emerald-500"> OS</label>
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="LI" class="filter-chk accent-emerald-500"> LI</label>
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="LE" class="filter-chk accent-emerald-500"> LE</label>
-                            <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="WC" class="filter-chk accent-emerald-500"> WC</label>
                             <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer"><input type="checkbox" checked value="FN" class="filter-chk accent-emerald-500"> FN</label>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-gray-400">Order By:</span>
-                        <select id="filter-sort-order" onchange="updateFilteredTimeline()" class="bg-gray-750 border border-gray-650 rounded px-2 py-1 text-xs text-white focus:outline-none">
+                        <select id="filter-sort-order" onchange="updateFilteredTimeline()" class="rounded px-2 py-1 text-xs focus:outline-none">
                             <option value="desc">Newest First</option>
                             <option value="asc">Oldest First</option>
                         </select>
@@ -244,33 +708,302 @@
         </main>
     </div>
 
-    <!-- NEW MODAL: DYNAMIC WORKER REGISTRATION -->
-    <div id="addEmployeeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <!-- MANNING PLAN MOVE & STATUS CONVERTER MODAL -->
+    <div id="moveStationModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-md rounded-xl shadow-2xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <h3 class="font-bold text-white text-base">Manning Assignment & Status</h3>
+                <button onclick="closeModal('moveStationModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div>
+                <span class="text-xs text-gray-400 uppercase font-bold">Team Member</span>
+                <p id="move-worker-name" class="text-base text-emerald-400 font-bold mt-0.5"></p>
+            </div>
+
+            <div class="flex bg-gray-750 p-1 rounded-lg border border-gray-650">
+                <button type="button" onclick="toggleManningModalMode('floor')" id="tab-btn-floor" class="flex-1 py-1 text-xs font-bold rounded bg-emerald-600 text-white">Reallocate Station</button>
+                <button type="button" onclick="toggleManningModalMode('status')" id="tab-btn-status" class="flex-1 py-1 text-xs font-bold rounded text-gray-400 hover:text-white">Change Status / Leave</button>
+            </div>
+
+            <!-- MODE 1: MOVE ON FLOOR -->
+            <div id="manning-mode-floor" class="space-y-3">
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1">Target Station on Floor</label>
+                    <select id="move-target-station" class="w-full rounded px-3 py-2 text-xs focus:outline-none"></select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button onclick="closeModal('moveStationModal')" class="px-3 py-1.5 bg-gray-700 text-white rounded text-xs">Cancel</button>
+                    <button onclick="confirmStationMove()" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-xs font-bold">Apply Floor Move</button>
+                </div>
+            </div>
+
+            <!-- MODE 2: CHANGE STATUS WITH MANDATORY DETAILS -->
+            <form id="manningStatusForm" onsubmit="handleManningStatusSubmit(event)" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1">Status Type (Auto-Backfills System)</label>
+                    <select id="manning-new-status" required class="w-full rounded px-3 py-2 text-xs focus:outline-none font-semibold">
+                        <option value="SL">SL - Sick Leave (Moves to Absent Pool)</option>
+                        <option value="CL">CL - Carers Leave (Moves to Absent Pool)</option>
+                        <option value="WC">WC - Work Cover (Moves to Absent Pool)</option>
+                        <option value="AL">AL - Annual Leave (Moves to Leave Pool)</option>
+                        <option value="OS">OS - Offsite / Course (Forklift, First Aid, etc)</option>
+                        <option value="LI">LI - Late In</option>
+                        <option value="LE">LE - Left Early</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] text-gray-400 font-bold mb-1">Start Date</label>
+                        <input type="date" id="manning-status-start" required class="w-full rounded px-2 py-1.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-gray-400 font-bold mb-1">Finish Date</label>
+                        <input type="date" id="manning-status-end" required class="w-full rounded px-2 py-1.5 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] text-gray-400 font-bold mb-1">Mandatory Narrative Reason / Context Notes</label>
+                    <textarea id="manning-status-notes" rows="2" required placeholder="State reason, course name, or certificate details..." class="w-full rounded p-2 text-xs"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button type="button" onclick="closeModal('moveStationModal')" class="px-3 py-1.5 bg-gray-700 text-white rounded text-xs">Cancel</button>
+                    <button type="submit" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-xs font-bold">Save Status & Sync System</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CALENDAR ENTRY DETAIL INSPECTION / EDIT / DELETE MODAL -->
+    <div id="viewEventDetailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                    <i data-lucide="file-badge" class="w-5 h-5 text-emerald-400"></i> Event Details & Management
+                </h3>
+                <button type="button" onclick="closeModal('viewEventDetailModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm">
+                <input type="hidden" id="event-detail-rec-id">
+                <div>
+                    <span class="text-xs text-gray-400 block font-bold uppercase">Employee</span>
+                    <p id="event-detail-name" class="text-lg font-bold text-white mt-0.5">-</p>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-400 block font-bold uppercase">Classification</span>
+                    <span id="event-detail-type" class="inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold">-</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-xs text-gray-400 block font-bold uppercase">Date Started</span>
+                        <p id="event-detail-start" class="text-gray-200 font-medium mt-0.5">-</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-400 block font-bold uppercase">Date Ended</span>
+                        <p id="event-detail-end" class="text-gray-200 font-medium mt-0.5">-</p>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-400 block font-bold uppercase">Context / Narrative Notes</span>
+                    <div id="event-detail-notes" class="mt-1 p-3 bg-gray-750/70 rounded-lg border border-gray-650 text-gray-300 text-xs leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">-</div>
+                </div>
+
+                <div>
+                    <span class="text-xs text-gray-400 block font-bold uppercase flex items-center gap-1.5">
+                        <i data-lucide="history" class="w-3.5 h-3.5 text-amber-400"></i> Audit Change History
+                    </span>
+                    <div id="event-detail-audit-log" class="mt-1 p-2.5 bg-gray-900/60 rounded border border-gray-700 max-h-28 overflow-y-auto text-[11px] text-gray-400 space-y-1">
+                        No revisions recorded.
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-gray-700 flex justify-between items-center">
+                    <button type="button" onclick="deleteCurrentEventRecord()" class="px-3.5 py-1.5 bg-red-900/50 hover:bg-red-800 text-red-300 border border-red-700 rounded text-xs font-bold flex items-center gap-1.5 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete Entry
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="openEditEventModal()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold flex items-center gap-1.5 transition">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit Entry
+                        </button>
+                        <button type="button" onclick="closeModal('viewEventDetailModal')" class="px-3 py-1.5 bg-gray-750 hover:bg-gray-650 text-white rounded text-xs">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT EVENT RECORD MODAL -->
+    <div id="editEventModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-gray-800 border border-gray-700 w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
-                <h3 class="font-bold text-lg text-white">Register New Team Member</h3>
+                <h3 class="font-bold text-base text-white">Edit Record & Log Reason</h3>
+                <button type="button" onclick="closeModal('editEventModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="editRecordForm" onsubmit="handleEditRecordSubmit(event)" class="p-6 space-y-3">
+                <input type="hidden" id="edit-rec-id">
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1">Classification Code</label>
+                    <select id="edit-rec-type" required class="w-full rounded px-3 py-2 text-xs">
+                        <option value="AL">AL - Annual Leave</option>
+                        <option value="SL">SL - Sick Leave</option>
+                        <option value="CL">CL - Carers Leave</option>
+                        <option value="WC">WC - Work Cover</option>
+                        <option value="OS">OS - Offsite / Course</option>
+                        <option value="LI">LI - Late In</option>
+                        <option value="LE">LE - Left Early</option>
+                        <option value="FN">FN - File Note</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Start Date</label>
+                        <input type="date" id="edit-rec-start" required class="w-full rounded px-2 py-1.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Finish Date</label>
+                        <input type="date" id="edit-rec-end" required class="w-full rounded px-2 py-1.5 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Record Context Notes</label>
+                    <textarea id="edit-rec-notes" rows="3" required class="w-full rounded p-2 text-xs"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-amber-400 font-bold mb-1">Reason for Editing (Added to Audit History)</label>
+                    <input type="text" id="edit-rec-reason" required placeholder="e.g. Corrected dates per medical certificate" class="w-full rounded px-3 py-1.5 text-xs">
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('editEventModal')" class="px-3 py-1.5 bg-gray-700 text-white rounded text-xs">Cancel</button>
+                    <button type="submit" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-xs font-bold">Save Revision</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REASSIGN POSITION MODAL -->
+    <div id="reassignRoleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+                <h3 class="font-bold text-lg text-white">Reassign Factory Position</h3>
+                <button type="button" onclick="closeModal('reassignRoleModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="reassignRoleForm" class="p-6 space-y-4">
+                <input type="hidden" id="reassign-emp-id">
+                <div>
+                    <span class="text-xs text-gray-400 block font-bold uppercase">Team Member</span>
+                    <p id="reassign-emp-name" class="text-lg font-bold text-white mt-0.5">-</p>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1 uppercase">Select New Position</label>
+                    <select id="reassign-role-select" class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"></select>
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('reassignRoleModal')" class="px-4 py-2 border border-gray-650 text-gray-300 text-sm rounded-lg hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-medium">Update Position</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT PROFILE MODAL -->
+    <div id="editProfileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                    <i data-lucide="user-cog" class="w-5 h-5 text-emerald-400"></i> Edit Team Member Profile
+                </h3>
+                <button type="button" onclick="closeModal('editProfileModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="editProfileForm" class="p-6 space-y-4">
+                <input type="hidden" id="edit-emp-id">
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Full Name</label>
+                    <input id="edit-emp-name" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Factory Position Slot</label>
+                    <select id="edit-emp-role" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Crew Assignment</label>
+                        <input id="edit-emp-crew" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Contact Phone / Email</label>
+                        <input id="edit-emp-contact" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Shift Setup</label>
+                    <input id="edit-emp-shift" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Workplace Motivation Tag</label>
+                    <select id="edit-emp-driver" class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                        <option value="Family Stability">Family Stability</option>
+                        <option value="Financial Optimization">Financial Optimization</option>
+                        <option value="Travel & Adventure">Travel & Adventure</option>
+                        <option value="Retirement Goal">Retirement Goal</option>
+                        <option value="Career Progression">Career Progression</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Performance Driver Narrative Description</label>
+                    <textarea id="edit-emp-desc" rows="3" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 border border-gray-650 text-gray-300 text-sm rounded-lg hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-medium">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DYNAMIC WORKER REGISTRATION MODAL -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
+                <h3 class="font-bold text-lg text-white" id="add-emp-modal-title">Register New Team Member</h3>
                 <button type="button" onclick="closeModal('addEmployeeModal')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form id="employeeForm" class="p-6 space-y-4">
-                <div><label class="block text-xs text-gray-400 font-bold mb-1">Full Name</label><input id="emp-name" type="text" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-xs text-gray-400 font-bold mb-1">Role Title</label><input id="emp-role" type="text" placeholder="Operator" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
-                    <div><label class="block text-xs text-gray-400 font-bold mb-1">Crew Assignment</label><input id="emp-crew" type="text" placeholder="Crew A" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Full Name</label>
+                    <input id="emp-name" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none" placeholder="Enter worker's full name...">
                 </div>
-                <div><label class="block text-xs text-gray-400 font-bold mb-1">Contact Email</label><input id="emp-contact" type="email" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
-                <div><label class="block text-xs text-gray-400 font-bold mb-1">Shift Setup</label><input id="emp-shift" type="text" placeholder="Fixed Day Shift" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Factory Position Slot</label>
+                    <select id="emp-role-select" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"></select>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-gray-400 font-bold mb-1">Motivation Tag</label>
-                        <select id="emp-driver" class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none">
-                            <option value="Family Stability">Family Stability</option>
-                            <option value="Financial Optimization">Financial Optimization</option>
-                            <option value="Travel & Adventure">Travel & Adventure</option>
-                            <option value="Retirement Goal">Retirement Goal</option>
-                        </select>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Crew Assignment</label>
+                        <input id="emp-crew" type="text" placeholder="Crew A" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 font-bold mb-1">Contact Email / Phone</label>
+                        <input id="emp-contact" type="text" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none" placeholder="0400 000 000 / email">
                     </div>
                 </div>
-                <div><label class="block text-xs text-gray-400 font-bold mb-1">Performance Driver Narrative Description</label><textarea id="emp-desc" rows="3" required placeholder="Outline internal work drivers..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white text-sm focus:border-emerald-500 focus:outline-none"></textarea></div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Shift Setup</label>
+                    <input id="emp-shift" type="text" placeholder="Rotating Roster - Day/Night 12h" required class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Workplace Motivation Tag</label>
+                    <select id="emp-driver" class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none">
+                        <option value="Family Stability">Family Stability</option>
+                        <option value="Financial Optimization">Financial Optimization</option>
+                        <option value="Travel & Adventure">Travel & Adventure</option>
+                        <option value="Retirement Goal">Retirement Goal</option>
+                        <option value="Career Progression">Career Progression</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 font-bold mb-1">Performance Driver Narrative Description</label>
+                    <textarea id="emp-desc" rows="3" required placeholder="Outline internal workplace motivators..." class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeModal('addEmployeeModal')" class="px-4 py-2 border border-gray-650 text-gray-300 text-sm rounded-lg hover:bg-gray-700">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-medium">Save Profile</button>
@@ -279,7 +1012,7 @@
         </div>
     </div>
 
-    <!-- RECONFIGURED LOG ACTION MODAL -->
+    <!-- LOG ACTION ENTRY MODAL -->
     <div id="logActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-850">
@@ -288,47 +1021,61 @@
             </div>
             <form id="entryForm" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Select Employee</label>
-                    <select id="form-employee" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500 text-sm"></select>
+                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Employee Name (Type or Select)</label>
+                    <input list="employeeDatalist" id="form-employee" required placeholder="Start typing name..." class="w-full rounded-lg px-3 py-2 font-semibold text-sm focus:outline-none focus:border-emerald-500">
+                    <datalist id="employeeDatalist"></datalist>
                 </div>
                 <div>
                     <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Entry Target Type</label>
                     <div class="grid grid-cols-4 gap-1.5">
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Annual Leave">
                             <input type="radio" name="entryType" value="AL" class="sr-only">
                             <span class="text-xs text-blue-400 font-bold">AL</span><span class="text-[9px] text-gray-400">Leave</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Sick Leave">
                             <input type="radio" name="entryType" value="SL" class="sr-only" checked>
                             <span class="text-xs text-red-400 font-bold">SL</span><span class="text-[9px] text-gray-400">Sick</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Carers Leave">
                             <input type="radio" name="entryType" value="CL" class="sr-only">
                             <span class="text-xs text-orange-400 font-bold">CL</span><span class="text-[9px] text-gray-400">Carer</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="LI" class="sr-only">
-                            <span class="text-xs text-purple-400 font-bold">LI</span><span class="text-[9px] text-gray-400">Late</span>
-                        </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
-                            <input type="radio" name="entryType" value="LE" class="sr-only">
-                            <span class="text-xs text-violet-400 font-bold">LE</span><span class="text-[9px] text-gray-400">Early</span>
-                        </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Work Cover">
                             <input type="radio" name="entryType" value="WC" class="sr-only">
                             <span class="text-xs text-pink-400 font-bold">WC</span><span class="text-[9px] text-gray-400">Cover</span>
                         </label>
-                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center">
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Offsite / Course">
+                            <input type="radio" name="entryType" value="OS" class="sr-only">
+                            <span class="text-xs text-cyan-400 font-bold">OS</span><span class="text-[9px] text-gray-400">Offsite</span>
+                        </label>
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Late In">
+                            <input type="radio" name="entryType" value="LI" class="sr-only">
+                            <span class="text-xs text-purple-400 font-bold">LI</span><span class="text-[9px] text-gray-400">Late</span>
+                        </label>
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="Left Early">
+                            <input type="radio" name="entryType" value="LE" class="sr-only">
+                            <span class="text-xs text-violet-400 font-bold">LE</span><span class="text-[9px] text-gray-400">Early</span>
+                        </label>
+                        <label class="border border-gray-650 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition text-center" title="File Note">
                             <input type="radio" name="entryType" value="FN" class="sr-only">
                             <span class="text-xs text-amber-400 font-bold">FN</span><span class="text-[9px] text-gray-400">Note</span>
                         </label>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label><input id="form-start" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none"></div>
-                    <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">End Date</label><input id="form-end" type="date" required class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:outline-none"></div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Start Date</label>
+                        <input id="form-start" type="date" required class="w-full rounded-lg px-3 py-2 font-semibold text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Finish Date</label>
+                        <input id="form-end" type="date" required class="w-full rounded-lg px-3 py-2 font-semibold text-sm focus:outline-none">
+                    </div>
                 </div>
-                <div><label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Narrative Notes</label><textarea id="form-notes" rows="3" required placeholder="Provide record log context parameters..." class="w-full bg-gray-750 border border-gray-650 rounded-lg px-3 py-2 text-white font-medium text-sm focus:outline-none placeholder-gray-500"></textarea></div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 font-bold mb-1.5">Narrative Notes</label>
+                    <textarea id="form-notes" rows="3" required placeholder="Provide shift details, reason, or context..." class="w-full rounded-lg px-3 py-2 font-medium text-sm focus:outline-none"></textarea>
+                </div>
                 <div class="pt-2 flex justify-end gap-3">
                     <button type="button" onclick="closeModal('logActionModal')" class="px-4 py-2 border border-gray-650 text-gray-300 rounded-lg text-sm hover:bg-gray-700">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium">Save Entry</button>
@@ -345,30 +1092,204 @@
         let selectedEmployee = "";
         
         let matrixCurrentYear = 2026;
-        let matrixCurrentMonth = 7;
+        let matrixCurrentMonth = 9;
+
+        let manningDateStr = "2026-09-16";
+        let activeManningAssignments = {};
+        let currentShiftTimes = {};
+
+        let movingWorkerEmpId = null;
+        let pendingLogEntry = null;
+
+        const manningStationLabels = {
+            "station-tooling": "Tooling",
+            "station-inks": "Inks",
+            "station-baler": "Baler",
+            "station-corr-control": "Corrugator - Control Room",
+            "station-corr-wet": "Corrugator - Wet End",
+            "station-corr-stackers": "Corrugator - Stackers",
+            "station-corr-grab": "Corrugator - Grab",
+            "station-g1-feeder": "Gopfert 1 - Feeder",
+            "station-g1-middle": "Gopfert 1 - Middleman",
+            "station-g1-operator": "Gopfert 1 - Operator",
+            "station-g2-feeder": "Gopfert 2 - Feeder",
+            "station-g2-middle": "Gopfert 2 - Middleman",
+            "station-g2-operator": "Gopfert 2 - Operator",
+            "station-g3-feeder": "Gopfert 3 - Feeder",
+            "station-g3-middle": "Gopfert 3 - Middleman",
+            "station-g3-operator": "Gopfert 3 - Operator",
+            "station-bobst-feeders": "Bobst - Feeders",
+            "station-bobst-operator": "Bobst - Operator",
+            "station-e175-feeder": "Emba 175 - Feeder",
+            "station-e175-middle": "Emba 175 - Middleman",
+            "station-e175-operator": "Emba 175 - Operator",
+            "station-e245-feeder": "Emba 245 - Feeder",
+            "station-e245-middle": "Emba 245 - Middleman",
+            "station-e245-operator": "Emba 245 - Operator",
+            "station-strapping": "Strapping Line",
+            "station-supervisors": "Supervisors",
+            "station-training": "Training",
+            "station-pems": "PEM's",
+            "station-floaters": "Shift Floater"
+        };
+
+        const factoryPositions = [
+            "Supervisor", "Supervisor", "Supervisor",
+            "Finishing Machine Operators - Emba 175 (A/S)",
+            "Finishing Machine Assistant Operators - Emba 175 (A/S)",
+            "Finishing machine Feed Operators - Emba 175 (A/S)",
+            "Finishing Machine Operators - Emba 245 (A/S)",
+            "Finishing Machine Assistant Operators - Emba 245 (A/S)",
+            "Finishing machine Feed Operators - Emba 245 (A/S)",
+            "Finishing Machine Operators - Gopfert 1 (A/S)",
+            "Finishing Machine Assistant Operators - Gopfert 1 (A/S)",
+            "Finishing machine Feed Operators - Gopfert 1 (A/S)",
+            "Finishing Machine Operators - Gopfert 2 (A/S)",
+            "Finishing Machine Assistant Operators - Gopfert 2 (A/S)",
+            "Finishing machine Feed Operators - Gopfert 2 (A/S)",
+            "Finishing Machine Operators - Gopfert 3 (A/S)",
+            "Finishing Machine Assistant Operators - Gopfert 3 (A/S)",
+            "Finishing machine Feed Operators - Gopfert 3 (A/S)",
+            "Finishing Machine Operators - Bobst Masterfold (A/S)",
+            "Finishing Machine Assistant Operators - Bobst Masterfold (A/S)",
+            "Finishing Machine Feeder - Bobst Masterfold (A/S)",
+            "Finishing Feed Operators - Bobst Masterfold (A/S)",
+            "Strapping Line Operator - (A/S)", "Strapping Line Operator - (A/S)",
+            "Annual Leave Cover", "Annual Leave Cover", "Annual Leave Cover", "Annual Leave Cover", "Annual Leave Cover",
+            "Corrugator Operators - Control Room - (A/S)",
+            "Corrugator Operators - Wet End - (A/S)", "Corrugator Operators - Wet End - (A/S)", "Corrugator Operators - Wet End - (A/S)",
+            "Corrugator Stackers - (A/S)", "Corrugator Stackers - (A/S)",
+            "Corrugator Grab Operator - (A/S)",
+            "Tooling Repair Technician - (A/S)", "Tooling Preparation Technician - (A/S)",
+            "Waste Room Operator - (A/S)"
+        ];
+
+        const uniquePositions = [...new Set(factoryPositions)];
+
+        const skillsColumns = [
+            "Ascor Corpal", "Gopfert", "Pizza Bagger", "Scoring Unit", "Gopfert Set-ups", 
+            "Gopfert Feeder", "Emba 245", "Emba 245 Set-ups", "Emba 245 Feeder", 
+            "Emba 175", "Emba 175 Set-ups", "Emba 175 Feeder", "Bobst", "Bobst Feeder", 
+            "Strappers", "Wrappers", "E80's", "Baler", "BCM", "Inks"
+        ];
+
+        const skillLevels = ["Not Trained", "Dependent", "Independent", "Competent", "Experienced"];
 
         window.addEventListener('DOMContentLoaded', () => {
-            updateThemeIcon('dark');
             initCalendar();
             
             const today = new Date();
             matrixCurrentYear = today.getFullYear();
             matrixCurrentMonth = today.getMonth() + 1;
 
-            // Bind checklist filtering listeners to dynamic modifier updates
+            manningDateStr = today.toISOString().split('T')[0];
+            document.getElementById('manning-date-picker').value = manningDateStr;
+
+            populateRoleDropdowns();
+            populateMoveTargetDropdown();
+
             document.querySelectorAll('.filter-chk').forEach(elem => {
                 elem.addEventListener('change', updateFilteredTimeline);
             });
+
+            setupDropzone();
+            lucide.createIcons();
         });
+
+        function populateMoveTargetDropdown() {
+            const select = document.getElementById('move-target-station');
+            select.innerHTML = "";
+            for (const [key, label] of Object.entries(manningStationLabels)) {
+                select.innerHTML += `<option value="${key}">${label}</option>`;
+            }
+        }
+
+        function populateRoleDropdowns() {
+            const addSelect = document.getElementById('emp-role-select');
+            const editSelect = document.getElementById('edit-emp-role');
+            const reassignSelect = document.getElementById('reassign-role-select');
+            
+            addSelect.innerHTML = "";
+            editSelect.innerHTML = "";
+            reassignSelect.innerHTML = "";
+
+            uniquePositions.forEach(pos => {
+                addSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+                editSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+                reassignSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+            });
+        }
 
         function initCalendar() {
             const calendarEl = document.getElementById('calendar-element');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                events: []
+                headerToolbar: { 
+                    left: 'prev,next today', 
+                    center: 'title', 
+                    right: 'dayGridMonth,timeGridWeek' 
+                },
+                events: [],
+                eventClick: function(info) {
+                    showEventDetails(info.event.extendedProps);
+                }
             });
             calendar.render();
+        }
+
+        function showEventDetails(props) {
+            document.getElementById('event-detail-rec-id').value = props.id || "";
+            document.getElementById('event-detail-name').innerText = props.employeeName;
+            
+            const typeBadge = document.getElementById('event-detail-type');
+            typeBadge.innerText = `${props.type} - ${getTypeLabel(props.type)}`;
+            typeBadge.className = `inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold ${getTypeClass(props.type)}`;
+            
+            document.getElementById('event-detail-start').innerText = props.startDate;
+            document.getElementById('event-detail-end').innerText = props.endDate;
+            document.getElementById('event-detail-notes').innerText = props.notes || "No context notes provided.";
+            
+            const auditEl = document.getElementById('event-detail-audit-log');
+            if (props.auditLog && props.auditLog.length > 0) {
+                auditEl.innerHTML = props.auditLog.map(entry => `
+                    <div class="border-b border-gray-800 pb-1">
+                        <span class="text-amber-400 font-semibold">[${entry.date || ''}]</span> ${entry.action}: ${entry.reason || ''}
+                    </div>
+                `).join("");
+            } else {
+                auditEl.innerHTML = "No previous revisions recorded.";
+            }
+
+            openModal('viewEventDetailModal');
+            lucide.createIcons();
+        }
+
+        function getTypeLabel(type) {
+            switch(type) {
+                case 'AL': return 'Annual Leave';
+                case 'SL': return 'Sick Leave';
+                case 'CL': return 'Carers Leave';
+                case 'WC': return 'Work Cover';
+                case 'OS': return 'Offsite / Course';
+                case 'LI': return 'Late In';
+                case 'LE': return 'Left Early';
+                case 'FN': return 'File Note';
+                default: return type;
+            }
+        }
+
+        function getTypeClass(type) {
+            switch(type) {
+                case 'AL': return 'bg-blue-900/60 text-blue-300 border border-blue-700';
+                case 'SL': return 'bg-red-900/60 text-red-300 border border-red-700';
+                case 'CL': return 'bg-orange-900/60 text-orange-300 border border-orange-700';
+                case 'WC': return 'bg-pink-900/60 text-pink-300 border border-pink-700';
+                case 'OS': return 'bg-cyan-900/60 text-cyan-300 border border-cyan-700';
+                case 'LI': return 'bg-purple-900/60 text-purple-300 border border-purple-700';
+                case 'LE': return 'bg-violet-900/60 text-violet-300 border border-violet-700';
+                case 'FN': return 'bg-amber-900/60 text-amber-300 border border-amber-700';
+                default: return 'bg-gray-700 text-white';
+            }
         }
 
         window.addEventListener('firebase-initialized', () => {
@@ -380,12 +1301,10 @@
             const { collection, getDocs, query, orderBy } = window.firestoreUtils;
             
             try {
-                // 1. Sync employee rosters
                 const empSnap = await getDocs(collection(window.db, "employees"));
                 employeeList = [];
                 empSnap.forEach(doc => employeeList.push({ id: doc.id, ...doc.data() }));
 
-                // 2. Sync history records
                 const recordSnap = await getDocs(query(collection(window.db, "records"), orderBy("timestamp", "desc")));
                 allRecords = [];
                 recordSnap.forEach(doc => allRecords.push({ id: doc.id, ...doc.data() }));
@@ -393,47 +1312,578 @@
                 updateGlobalFormSelectors();
                 renderDashboard();
                 buildMatrixGrid();
+                buildSkillsMatrix();
                 renderRoster();
                 updateCalendarEvents();
+                await loadManningPlanForDate(manningDateStr);
                 
-                if(selectedEmployee) viewIndividualReport(selectedEmployee);
+                lucide.createIcons();
             } catch (err) {
                 console.error("Firestore loading failure: ", err);
             }
         }
 
-        // Form Submission - Dynamic Employee Registration
+        function openEditEventModal() {
+            const recId = document.getElementById('event-detail-rec-id').value;
+            const record = allRecords.find(r => r.id === recId);
+            if (!record) return;
+
+            document.getElementById('edit-rec-id').value = record.id;
+            document.getElementById('edit-rec-type').value = record.type;
+            document.getElementById('edit-rec-start').value = record.startDate;
+            document.getElementById('edit-rec-end').value = record.endDate;
+            document.getElementById('edit-rec-notes').value = record.notes || "";
+            document.getElementById('edit-rec-reason').value = "";
+
+            closeModal('viewEventDetailModal');
+            openModal('editEventModal');
+        }
+
+        async function handleEditRecordSubmit(e) {
+            e.preventDefault();
+            const recId = document.getElementById('edit-rec-id').value;
+            const record = allRecords.find(r => r.id === recId);
+            if (!record) return;
+
+            const newType = document.getElementById('edit-rec-type').value;
+            const newStart = document.getElementById('edit-rec-start').value;
+            const newEnd = document.getElementById('edit-rec-end').value;
+            const newNotes = document.getElementById('edit-rec-notes').value;
+            const reason = document.getElementById('edit-rec-reason').value.trim();
+
+            const auditEntry = {
+                date: new Date().toLocaleString(),
+                action: `Updated from [${record.type}] (${record.startDate} - ${record.endDate}) to [${newType}] (${newStart} - ${newEnd})`,
+                reason: reason
+            };
+
+            const updatedAudit = [...(record.auditLog || []), auditEntry];
+
+            try {
+                await window.firestoreUtils.updateDoc(window.firestoreUtils.doc(window.db, "records", recId), {
+                    type: newType,
+                    startDate: newStart,
+                    endDate: newEnd,
+                    notes: newNotes,
+                    auditLog: updatedAudit
+                });
+
+                closeModal('editEventModal');
+                await syncDataEngine();
+                alert("Record updated successfully. Audit history preserved.");
+            } catch (err) {
+                console.error("Error updating record:", err);
+                alert("Error updating record.");
+            }
+        }
+
+        async function deleteCurrentEventRecord() {
+            const recId = document.getElementById('event-detail-rec-id').value;
+            const record = allRecords.find(r => r.id === recId);
+            if (!record) return;
+
+            const confirmReason = prompt(`Are you sure you want to delete this ${record.type} entry for ${record.employeeName}? Please state reason for audit logs:`);
+            if (!confirmReason || confirmReason.trim() === "") return;
+
+            try {
+                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
+                    employeeName: record.employeeName,
+                    type: "FN",
+                    startDate: record.startDate,
+                    endDate: record.endDate,
+                    notes: `[AUDIT DELETION]: Deleted ${record.type} record (${record.startDate} to ${record.endDate}). Reason: ${confirmReason.trim()}`,
+                    timestamp: new Date().toISOString()
+                });
+
+                await window.firestoreUtils.deleteDoc(window.firestoreUtils.doc(window.db, "records", recId));
+
+                closeModal('viewEventDetailModal');
+                await syncDataEngine();
+                alert("Record deleted. A deletion file note has been logged in the audit trail.");
+            } catch (err) {
+                console.error("Failed to delete record:", err);
+                alert("Failed to delete record.");
+            }
+        }
+
+        function toggleManningModalMode(mode) {
+            const floorSec = document.getElementById('manning-mode-floor');
+            const statusSec = document.getElementById('manningStatusForm');
+            const btnFloor = document.getElementById('tab-btn-floor');
+            const btnStatus = document.getElementById('tab-btn-status');
+
+            if (mode === 'floor') {
+                floorSec.classList.remove('hidden');
+                statusSec.classList.add('hidden');
+                btnFloor.className = "flex-1 py-1 text-xs font-bold rounded bg-emerald-600 text-white";
+                btnStatus.className = "flex-1 py-1 text-xs font-bold rounded text-gray-400 hover:text-white";
+            } else {
+                floorSec.classList.add('hidden');
+                statusSec.classList.remove('hidden');
+                btnFloor.className = "flex-1 py-1 text-xs font-bold rounded text-gray-400 hover:text-white";
+                btnStatus.className = "flex-1 py-1 text-xs font-bold rounded bg-emerald-600 text-white";
+
+                document.getElementById('manning-status-start').value = manningDateStr;
+                document.getElementById('manning-status-end').value = manningDateStr;
+            }
+        }
+
+        async function handleManningStatusSubmit(e) {
+            e.preventDefault();
+            if (!movingWorkerEmpId) return;
+
+            const emp = employeeList.find(e => e.id === movingWorkerEmpId);
+            if (!emp) return;
+
+            const newType = document.getElementById('manning-new-status').value;
+            const start = document.getElementById('manning-status-start').value;
+            const end = document.getElementById('manning-status-end').value;
+            const notes = document.getElementById('manning-status-notes').value.trim();
+
+            try {
+                await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
+                    employeeName: emp.name,
+                    type: newType,
+                    startDate: start,
+                    endDate: end,
+                    notes: notes,
+                    timestamp: new Date().toISOString(),
+                    auditLog: [{
+                        date: new Date().toLocaleString(),
+                        action: `Logged from Manning Plan as ${newType}`,
+                        reason: notes
+                    }]
+                });
+
+                closeModal('moveStationModal');
+                document.getElementById('manningStatusForm').reset();
+                await syncDataEngine();
+                alert(`Updated ${emp.name} to ${getTypeLabel(newType)}. System backfilled successfully.`);
+            } catch (err) {
+                console.error("Status assignment error:", err);
+                alert("Error assigning status.");
+            }
+        }
+
+        function navigateManningDate(direction) {
+            const cur = new Date(manningDateStr);
+            cur.setDate(cur.getDate() + direction);
+            manningDateStr = cur.toISOString().split('T')[0];
+            document.getElementById('manning-date-picker').value = manningDateStr;
+            loadManningPlanForDate(manningDateStr);
+        }
+
+        function jumpManningToToday() {
+            manningDateStr = new Date().toISOString().split('T')[0];
+            document.getElementById('manning-date-picker').value = manningDateStr;
+            loadManningPlanForDate(manningDateStr);
+        }
+
+        function changeManningDateManual() {
+            manningDateStr = document.getElementById('manning-date-picker').value;
+            loadManningPlanForDate(manningDateStr);
+        }
+
+        async function loadManningPlanForDate(dateStr) {
+            const dateObj = new Date(dateStr + "T00:00:00");
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const dayName = days[dateObj.getDay()];
+            const [y, m, d] = dateStr.split('-');
+            const formatted = `${dayName} ${d}/${m}/${y.slice(2)}`;
+
+            document.getElementById('manning-date-heading').innerText = formatted;
+            document.getElementById('print-date-display').innerText = formatted;
+
+            activeManningAssignments = {};
+            try {
+                const planSnap = await window.firestoreUtils.getDoc(window.firestoreUtils.doc(window.db, "manning_plans", dateStr));
+                if (planSnap.exists()) {
+                    activeManningAssignments = planSnap.data().assignments || {};
+                    if (planSnap.data().shiftTimes) {
+                        currentShiftTimes = planSnap.data().shiftTimes;
+                        applyShiftTimesToUI();
+                    }
+                }
+            } catch (e) {
+                console.log("No custom floor plan stored for date, auto-assigning from profile roles");
+            }
+
+            renderManningBoard();
+        }
+
+        function renderManningBoard() {
+            for (const key of Object.keys(manningStationLabels)) {
+                const el = document.getElementById(key);
+                if (el) el.innerHTML = "";
+            }
+            document.getElementById('station-leave-pool').innerHTML = "";
+            document.getElementById('station-absent-pool').innerHTML = "";
+            document.getElementById('station-offsite-pool').innerHTML = "";
+
+            let onShiftCount = 0;
+            let leaveCount = 0;
+            let absentCount = 0;
+            let offsiteCount = 0;
+
+            employeeList.forEach(emp => {
+                const activeRecord = allRecords.find(r => r.employeeName.toLowerCase() === emp.name.toLowerCase() && manningDateStr >= r.startDate && manningDateStr <= r.endDate);
+
+                if (activeRecord) {
+                    if (activeRecord.type === 'AL') {
+                        leaveCount++;
+                        createManningBadge('station-leave-pool', emp, 'bg-blue-900/60 text-blue-200 border-blue-700', `AL (${activeRecord.startDate} - ${activeRecord.endDate})`);
+                    } else if (['SL', 'CL', 'WC'].includes(activeRecord.type)) {
+                        absentCount++;
+                        const label = activeRecord.type === 'WC' ? 'Work Cover' : activeRecord.type;
+                        createManningBadge('station-absent-pool', emp, 'bg-red-900/60 text-red-200 border-red-700', `${label}: ${activeRecord.notes || 'Absent'}`);
+                    } else if (activeRecord.type === 'OS') {
+                        offsiteCount++;
+                        createManningBadge('station-offsite-pool', emp, 'bg-cyan-900/60 text-cyan-200 border-cyan-700', `Offsite Course: ${activeRecord.notes || 'Training'}`);
+                    } else {
+                        onShiftCount++;
+                        placeWorkerOnFloor(emp);
+                    }
+                } else {
+                    onShiftCount++;
+                    placeWorkerOnFloor(emp);
+                }
+            });
+
+            document.getElementById('manning-headcount-badge').innerText = `${onShiftCount} On-Shift`;
+            document.getElementById('print-headcount').innerText = `${onShiftCount} People`;
+            document.getElementById('count-leave-pool').innerText = leaveCount;
+            document.getElementById('count-absent-pool').innerText = absentCount;
+            document.getElementById('count-offsite-pool').innerText = offsiteCount;
+            lucide.createIcons();
+        }
+
+        function placeWorkerOnFloor(emp) {
+            let stationKey = activeManningAssignments[emp.id];
+
+            if (!stationKey) {
+                const r = (emp.role || "").toLowerCase();
+                if (r.includes("supervisor")) stationKey = "station-supervisors";
+                else if (r.includes("control room")) stationKey = "station-corr-control";
+                else if (r.includes("wet end")) stationKey = "station-corr-wet";
+                else if (r.includes("stacker")) stationKey = "station-corr-stackers";
+                else if (r.includes("grab")) stationKey = "station-corr-grab";
+                else if (r.includes("tooling")) stationKey = "station-tooling";
+                else if (r.includes("ink")) stationKey = "station-inks";
+                else if (r.includes("baler")) stationKey = "station-baler";
+                else if (r.includes("strapping")) stationKey = "station-strapping";
+                else if (r.includes("gopfert 1") && r.includes("feed")) stationKey = "station-g1-feeder";
+                else if (r.includes("gopfert 1") && r.includes("assist")) stationKey = "station-g1-middle";
+                else if (r.includes("gopfert 1")) stationKey = "station-g1-operator";
+                else if (r.includes("gopfert 2") && r.includes("feed")) stationKey = "station-g2-feeder";
+                else if (r.includes("gopfert 2") && r.includes("assist")) stationKey = "station-g2-middle";
+                else if (r.includes("gopfert 2")) stationKey = "station-g2-operator";
+                else if (r.includes("gopfert 3") && r.includes("feed")) stationKey = "station-g3-feeder";
+                else if (r.includes("gopfert 3") && r.includes("assist")) stationKey = "station-g3-middle";
+                else if (r.includes("gopfert 3")) stationKey = "station-g3-operator";
+                else if (r.includes("bobst") && r.includes("feed")) stationKey = "station-bobst-feeders";
+                else if (r.includes("bobst")) stationKey = "station-bobst-operator";
+                else if (r.includes("emba 175") && r.includes("feed")) stationKey = "station-e175-feeder";
+                else if (r.includes("emba 175") && r.includes("assist")) stationKey = "station-e175-middle";
+                else if (r.includes("emba 175")) stationKey = "station-e175-operator";
+                else if (r.includes("emba 245") && r.includes("feed")) stationKey = "station-e245-feeder";
+                else if (r.includes("emba 245") && r.includes("assist")) stationKey = "station-e245-middle";
+                else if (r.includes("emba 245")) stationKey = "station-e245-operator";
+                else stationKey = "station-floaters";
+            }
+
+            let colorClass = "bg-sky-500 text-white border-sky-400";
+            if (stationKey === "station-supervisors") colorClass = "bg-amber-500 text-black border-amber-300 font-black";
+            else if (stationKey.includes("feeder")) colorClass = "bg-purple-700 text-white border-purple-500";
+            else if (stationKey.includes("middle")) colorClass = "bg-cyan-500 text-black border-cyan-300 font-bold";
+            else if (stationKey.includes("stacker") || stationKey.includes("wet") || stationKey.includes("grab")) colorClass = "bg-orange-500 text-white border-orange-400";
+
+            createManningBadge(stationKey, emp, colorClass);
+        }
+
+        function createManningBadge(containerId, emp, colorClass, statusTip = "") {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const badge = document.createElement('div');
+            badge.className = `manning-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm cursor-pointer select-none ${colorClass}`;
+            badge.title = statusTip || `Role: ${emp.role || 'Unassigned'} - Click to move machine or change status`;
+            
+            badge.innerHTML = `
+                <span onclick="promptInlineEditName('${emp.id}', '${emp.name}')" class="hover:underline">${emp.name}</span>
+                <button onclick="openMoveStationModal('${emp.id}', '${emp.name}')" class="text-white/80 hover:text-white no-print" title="Reallocate or Change Status">
+                    <i data-lucide="shuffle" class="w-3 h-3"></i>
+                </button>
+            `;
+            container.appendChild(badge);
+        }
+
+        function openMoveStationModal(empId, empName) {
+            movingWorkerEmpId = empId;
+            document.getElementById('move-worker-name').innerText = empName;
+            document.getElementById('move-target-station').value = activeManningAssignments[empId] || "station-floaters";
+            toggleManningModalMode('floor');
+            openModal('moveStationModal');
+        }
+
+        async function confirmStationMove() {
+            if (!movingWorkerEmpId) return;
+            const targetStation = document.getElementById('move-target-station').value;
+            activeManningAssignments[movingWorkerEmpId] = targetStation;
+            closeModal('moveStationModal');
+
+            try {
+                await window.firestoreUtils.setDoc(window.firestoreUtils.doc(window.db, "manning_plans", manningDateStr), {
+                    assignments: activeManningAssignments,
+                    shiftTimes: currentShiftTimes
+                }, { merge: true });
+            } catch (e) {
+                console.error("Failed saving floor assignment: ", e);
+            }
+
+            renderManningBoard();
+        }
+
+        async function promptInlineEditName(empId, currentName) {
+            const newName = prompt("Edit team member name:", currentName);
+            if (!newName || newName.trim() === "" || newName.trim() === currentName) return;
+
+            try {
+                await window.firestoreUtils.updateDoc(window.firestoreUtils.doc(window.db, "employees", empId), {
+                    name: newName.trim()
+                });
+                await syncDataEngine();
+            } catch (e) {
+                alert("Error renaming employee.");
+            }
+        }
+
+        // DRAG AND DROP SPREADSHEET TIME PARSER
+        function setupDropzone() {
+            const dropzone = document.getElementById('manning-dropzone');
+            
+            ['dragenter', 'dragover'].forEach(name => {
+                dropzone.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('border-emerald-300', 'bg-emerald-950/60');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(name => {
+                dropzone.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('border-emerald-300', 'bg-emerald-950/60');
+                });
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    handleTimesSpreadsheet(files);
+                }
+            });
+        }
+
+        function handleTimesSpreadsheet(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            document.getElementById('dropzone-label').innerText = file.name;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+                    parseTimesSheetRows(json);
+
+                    await window.firestoreUtils.setDoc(window.firestoreUtils.doc(window.db, "manning_plans", manningDateStr), {
+                        shiftTimes: currentShiftTimes,
+                        assignments: activeManningAssignments
+                    }, { merge: true });
+
+                    document.getElementById('spreadsheet-sync-status').innerText = `Synced with ${file.name}`;
+                } catch (err) {
+                    console.error("Spreadsheet parse failure:", err);
+                    alert("Error parsing time spreadsheet. Ensure it matches daily shift format.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseTimesSheetRows(rows) {
+            rows.forEach(row => {
+                const text0 = String(row[0] || "").trim();
+                const afterVal = String(row[1] || "").trim();
+
+                if (text0.toLowerCase().includes("corrugator")) currentShiftTimes["Corrugator"] = afterVal;
+                if (text0.toLowerCase().includes("gopfert 1")) currentShiftTimes["Gopfert 1"] = afterVal;
+                if (text0.toLowerCase().includes("gopfert 2")) currentShiftTimes["Gopfert 2"] = afterVal;
+                if (text0.toLowerCase().includes("gopfert 3")) currentShiftTimes["Gopfert 3"] = afterVal;
+                if (text0.toLowerCase().includes("emba 175")) currentShiftTimes["Emba 175"] = afterVal;
+                if (text0.toLowerCase().includes("emba 245")) currentShiftTimes["Emba 245"] = afterVal;
+                if (text0.toLowerCase().includes("bobst") && !text0.toLowerCase().includes("maint")) currentShiftTimes["Bobst"] = afterVal;
+            });
+
+            applyShiftTimesToUI();
+        }
+
+        function applyShiftTimesToUI() {
+            if (currentShiftTimes["Corrugator"]) document.getElementById('time-corrugator').innerText = currentShiftTimes["Corrugator"];
+            if (currentShiftTimes["Gopfert 1"]) document.getElementById('time-gopfert-1').innerText = currentShiftTimes["Gopfert 1"];
+            if (currentShiftTimes["Gopfert 2"]) document.getElementById('time-gopfert-2').innerText = currentShiftTimes["Gopfert 2"];
+            if (currentShiftTimes["Gopfert 3"]) document.getElementById('time-gopfert-3').innerText = currentShiftTimes["Gopfert 3"];
+            if (currentShiftTimes["Emba 175"]) document.getElementById('time-emba-175').innerText = currentShiftTimes["Emba 175"];
+            if (currentShiftTimes["Emba 245"]) document.getElementById('time-emba-245').innerText = currentShiftTimes["Emba 245"];
+            if (currentShiftTimes["Bobst"]) document.getElementById('time-bobst').innerText = currentShiftTimes["Bobst"];
+        }
+
+        // Add Employee
         document.getElementById('employeeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const createdName = document.getElementById('emp-name').value.trim();
             try {
                 await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "employees"), {
-                    name: document.getElementById('emp-name').value,
-                    role: document.getElementById('emp-role').value,
+                    name: createdName,
+                    role: document.getElementById('emp-role-select').value,
                     crew: document.getElementById('emp-crew').value,
                     contact: document.getElementById('emp-contact').value,
                     shift: document.getElementById('emp-shift').value,
                     driver: document.getElementById('emp-driver').value,
-                    description: document.getElementById('emp-desc').value
+                    description: document.getElementById('emp-desc').value,
+                    skills: {}
                 });
                 closeModal('addEmployeeModal');
                 document.getElementById('employeeForm').reset();
                 await syncDataEngine();
+
+                if (pendingLogEntry) {
+                    document.getElementById('form-employee').value = createdName;
+                    const radio = document.querySelector(`input[name="entryType"][value="${pendingLogEntry.type}"]`);
+                    if (radio) radio.checked = true;
+                    document.getElementById('form-start').value = pendingLogEntry.startDate;
+                    document.getElementById('form-end').value = pendingLogEntry.endDate;
+                    document.getElementById('form-notes').value = pendingLogEntry.notes;
+                    pendingLogEntry = null;
+                    openModal('logActionModal');
+                }
             } catch(err) {
                 alert("Error adding employee profile.");
             }
         });
 
-        // Form Submission - Operational Log Entries
+        // Edit Profile Form Submission
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const empId = document.getElementById('edit-emp-id').value;
+            const updatedName = document.getElementById('edit-emp-name').value.trim();
+
+            try {
+                await window.firestoreUtils.updateDoc(window.firestoreUtils.doc(window.db, "employees", empId), {
+                    name: updatedName,
+                    role: document.getElementById('edit-emp-role').value,
+                    crew: document.getElementById('edit-emp-crew').value,
+                    contact: document.getElementById('edit-emp-contact').value,
+                    shift: document.getElementById('edit-emp-shift').value,
+                    driver: document.getElementById('edit-emp-driver').value,
+                    description: document.getElementById('edit-emp-desc').value
+                });
+
+                closeModal('editProfileModal');
+                selectedEmployee = updatedName;
+                await syncDataEngine();
+            } catch(err) {
+                alert("Error updating profile details.");
+            }
+        });
+
+        function openEditCurrentProfileModal() {
+            const emp = employeeList.find(e => e.name === selectedEmployee);
+            if (!emp) return;
+
+            document.getElementById('edit-emp-id').value = emp.id;
+            document.getElementById('edit-emp-name').value = emp.name;
+            document.getElementById('edit-emp-role').value = emp.role || uniquePositions[0];
+            document.getElementById('edit-emp-crew').value = emp.crew || "";
+            document.getElementById('edit-emp-contact').value = emp.contact || "";
+            document.getElementById('edit-emp-shift').value = emp.shift || "";
+            document.getElementById('edit-emp-driver').value = emp.driver || "Family Stability";
+            document.getElementById('edit-emp-desc').value = emp.description || "";
+
+            openModal('editProfileModal');
+        }
+
+        document.getElementById('reassignRoleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const empId = document.getElementById('reassign-emp-id').value;
+            const newRole = document.getElementById('reassign-role-select').value;
+            
+            try {
+                await window.firestoreUtils.updateDoc(window.firestoreUtils.doc(window.db, "employees", empId), {
+                    role: newRole
+                });
+                closeModal('reassignRoleModal');
+                await syncDataEngine();
+            } catch(err) {
+                alert("Error reassigning employee role.");
+            }
+        });
+
+        function openReassignModal(empId, empName, currentRole) {
+            document.getElementById('reassign-emp-id').value = empId;
+            document.getElementById('reassign-emp-name').innerText = empName;
+            document.getElementById('reassign-role-select').value = currentRole;
+            openModal('reassignRoleModal');
+        }
+
+        // Operational Log Submit
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const enteredName = document.getElementById('form-employee').value.trim();
+            const selectedType = document.querySelector('input[name="entryType"]:checked').value;
+            const startDate = document.getElementById('form-start').value;
+            const endDate = document.getElementById('form-end').value;
+            const notes = document.getElementById('form-notes').value;
+
+            const exists = employeeList.some(emp => emp.name.toLowerCase() === enteredName.toLowerCase());
+
+            if (!exists) {
+                pendingLogEntry = {
+                    name: enteredName,
+                    type: selectedType,
+                    startDate: startDate,
+                    endDate: endDate,
+                    notes: notes
+                };
+
+                closeModal('logActionModal');
+
+                setTimeout(() => {
+                    alert(`"${enteredName}" does not exist in the roster yet. Please complete their profile details to add them.`);
+                    document.getElementById('emp-name').value = enteredName;
+                    document.getElementById('add-emp-modal-title').innerText = `Register "${enteredName}" to Continue`;
+                    openModal('addEmployeeModal');
+                }, 200);
+                return;
+            }
+
             try {
                 await window.firestoreUtils.addDoc(window.firestoreUtils.collection(window.db, "records"), {
-                    employeeName: document.getElementById('form-employee').value,
-                    type: document.querySelector('input[name="entryType"]:checked').value,
-                    startDate: document.getElementById('form-start').value,
-                    endDate: document.getElementById('form-end').value,
-                    notes: document.getElementById('form-notes').value,
-                    timestamp: new Date().toISOString()
+                    employeeName: enteredName,
+                    type: selectedType,
+                    startDate: startDate,
+                    endDate: endDate,
+                    notes: notes,
+                    timestamp: new Date().toISOString(),
+                    auditLog: [{
+                        date: new Date().toLocaleString(),
+                        action: `Created record as ${selectedType}`,
+                        reason: notes
+                    }]
                 });
                 closeModal('logActionModal');
                 document.getElementById('entryForm').reset();
@@ -444,10 +1894,10 @@
         });
 
         function updateGlobalFormSelectors() {
-            const selectEl = document.getElementById('form-employee');
-            selectEl.innerHTML = "";
+            const datalist = document.getElementById('employeeDatalist');
+            datalist.innerHTML = "";
             employeeList.forEach(emp => {
-                selectEl.innerHTML += `<option value="${emp.name}" class="text-white bg-gray-750">${emp.name}</option>`;
+                datalist.innerHTML += `<option value="${emp.name}"></option>`;
             });
         }
 
@@ -465,62 +1915,319 @@
             buildMatrixGrid();
         }
 
+        // ATTENDANCE MATRIX ENGINE (PINNED HEADER, TODAY'S STATUS GROUPING, WEEKEND COLORS & FULL-WEEK BOUNDARIES)
         function buildMatrixGrid() {
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             document.getElementById('matrix-month-heading').innerText = `${monthNames[matrixCurrentMonth - 1]} ${matrixCurrentYear} - Roster Grid`;
             
-            const monthValKey = `${matrixCurrentYear}-${String(matrixCurrentMonth).padStart(2, '0')}`;
-            const daysInMonth = new Date(matrixCurrentYear, matrixCurrentMonth, 0).getDate();
-            
+            const daysInCurrentMonth = new Date(matrixCurrentYear, matrixCurrentMonth, 0).getDate();
+            const firstDateOfMonth = new Date(matrixCurrentYear, matrixCurrentMonth - 1, 1);
+            const lastDateOfMonth = new Date(matrixCurrentYear, matrixCurrentMonth - 1, daysInCurrentMonth);
+
+            const displayDates = [];
+
+            let firstDayOfWeek = firstDateOfMonth.getDay();
+            let daysToMonday = (firstDayOfWeek === 0) ? 6 : (firstDayOfWeek - 1);
+            for (let i = daysToMonday; i > 0; i--) {
+                const padDate = new Date(matrixCurrentYear, matrixCurrentMonth - 1, 1 - i);
+                displayDates.push({ date: padDate, isCurrentMonth: false });
+            }
+
+            for (let d = 1; d <= daysInCurrentMonth; d++) {
+                displayDates.push({ date: new Date(matrixCurrentYear, matrixCurrentMonth - 1, d), isCurrentMonth: true });
+            }
+
+            let lastDayOfWeek = lastDateOfMonth.getDay();
+            let daysToFriday = 0;
+            if (lastDayOfWeek >= 1 && lastDayOfWeek < 5) {
+                daysToFriday = 5 - lastDayOfWeek;
+            } else if (lastDayOfWeek === 0) {
+                daysToFriday = 5;
+            } else if (lastDayOfWeek === 6) {
+                daysToFriday = 6;
+            }
+            for (let i = 1; i <= daysToFriday; i++) {
+                const padDate = new Date(matrixCurrentYear, matrixCurrentMonth - 1, daysInCurrentMonth + i);
+                displayDates.push({ date: padDate, isCurrentMonth: false });
+            }
+
             const headerRow = document.getElementById('matrix-header-row');
             const bodyRows = document.getElementById('matrix-body-rows');
+            const dayInitials = ["S", "M", "T", "W", "T", "F", "S"];
+
+            headerRow.innerHTML = `<th class="px-4 py-3 sticky-matrix-corner-name text-white font-bold min-w-[170px]">Employee</th>`;
             
-            headerRow.innerHTML = `<th class="px-4 py-3 sticky-col-left bg-gray-850 text-white font-bold border-r border-gray-700 min-w-[160px]">Employee</th>`;
-            for (let d = 1; d <= daysInMonth; d++) {
-                headerRow.innerHTML += `<th class="px-2 py-3 text-center min-w-[40px] font-bold">${d}</th>`;
-            }
-            headerRow.innerHTML += `<th class="px-4 py-3 sticky-col-right bg-gray-850 text-white font-bold border-l border-gray-700 text-center min-w-[140px]">Totals (Abs / BF)</th>`;
+            displayDates.forEach(item => {
+                const dObj = item.date;
+                const dayNum = dObj.getDate();
+                const dayOfWeek = dObj.getDay();
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                const letter = dayInitials[dayOfWeek];
+
+                const letterColor = isWeekend ? "text-amber-400 font-extrabold" : "text-gray-400 font-semibold";
+                const numColor = isWeekend ? "text-amber-300 font-bold" : (item.isCurrentMonth ? "text-gray-200 font-medium" : "text-gray-500 font-normal");
+                const bgHeader = isWeekend ? "bg-amber-950/40 border-amber-900/60" : "bg-gray-855";
+
+                const monthTag = !item.isCurrentMonth ? `<span class="text-[8px] text-gray-500 uppercase block">${monthNames[dObj.getMonth()].slice(0, 3)}</span>` : "";
+
+                headerRow.innerHTML += `
+                    <th class="px-1 py-2 text-center min-w-[38px] border-r border-gray-700 select-none sticky-matrix-th ${bgHeader}">
+                        ${monthTag}
+                        <div class="text-[10px] leading-tight ${letterColor}">${letter}</div>
+                        <div class="text-xs ${numColor}">${dayNum}</div>
+                    </th>
+                `;
+            });
+
+            headerRow.innerHTML += `<th class="px-4 py-3 sticky-matrix-corner-right text-white font-bold text-center min-w-[140px]">Totals (Abs / BF)</th>`;
 
             bodyRows.innerHTML = "";
-            if(employeeList.length === 0) {
-                bodyRows.innerHTML = `<tr><td colspan="${daysInMonth+2}" class="p-6 text-center text-gray-500">No active team members registered in system database.</td></tr>`;
+            if (employeeList.length === 0) {
+                bodyRows.innerHTML = `<tr><td colspan="${displayDates.length + 2}" class="p-6 text-center text-gray-500">No active team members registered in system database.</td></tr>`;
                 return;
             }
 
-            employeeList.forEach(emp => {
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            function getTodayPriority(empName) {
+                const rec = allRecords.find(r => r.employeeName.toLowerCase() === empName.toLowerCase() && todayStr >= r.startDate && todayStr <= r.endDate);
+                if (!rec) return { score: 999, type: null, record: null };
+                switch (rec.type) {
+                    case 'AL': return { score: 1, type: 'AL', record: rec };
+                    case 'OS': return { score: 2, type: 'OS', record: rec };
+                    case 'WC': return { score: 3, type: 'WC', record: rec };
+                    case 'CL': return { score: 4, type: 'CL', record: rec };
+                    case 'SL': return { score: 5, type: 'SL', record: rec };
+                    case 'LI': return { score: 6, type: 'LI', record: rec };
+                    case 'LE': return { score: 6, type: 'LE', record: rec };
+                    case 'FN': return { score: 7, type: 'FN', record: rec };
+                    default: return { score: 8, type: rec.type, record: rec };
+                }
+            }
+
+            const sortMode = document.getElementById('matrix-sort-by') ? document.getElementById('matrix-sort-by').value : 'today-first';
+            let sortedRoster = [...employeeList];
+
+            if (sortMode === 'today-first') {
+                sortedRoster.sort((a, b) => {
+                    const prioA = getTodayPriority(a.name).score;
+                    const prioB = getTodayPriority(b.name).score;
+                    if (prioA !== prioB) return prioA - prioB;
+                    return a.name.localeCompare(b.name);
+                });
+            } else if (sortMode === 'az') {
+                sortedRoster.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortMode === 'za') {
+                sortedRoster.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (sortMode === 'machine') {
+                sortedRoster.sort((a, b) => {
+                    let idxA = factoryPositions.indexOf(a.role);
+                    let idxB = factoryPositions.indexOf(b.role);
+                    if (idxA === -1) idxA = 999;
+                    if (idxB === -1) idxB = 999;
+                    if (idxA !== idxB) return idxA - idxB;
+                    return a.name.localeCompare(b.name);
+                });
+            }
+
+            sortedRoster.forEach(emp => {
                 const empRecords = allRecords.filter(r => r.employeeName === emp.name);
                 const stats = calculateBradford(empRecords);
+                const todayPrio = getTodayPriority(emp.name);
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-750 border-b border-gray-700";
                 
-                let rowHTML = `<td class="px-4 py-3 sticky-col-left bg-gray-800 text-white border-r border-gray-700 hover:underline cursor-pointer font-medium" onclick="viewIndividualReport('${emp.name}')">${emp.name}</td>`;
+                let statusTag = "";
+                if (todayPrio.type) {
+                    const tagClass = getTypeClass(todayPrio.type);
+                    statusTag = `<span class="ml-1.5 px-1 py-0.2 rounded text-[9px] font-black uppercase ${tagClass}" title="Today's Active Status: ${getTypeLabel(todayPrio.type)}">${todayPrio.type}</span>`;
+                }
+
+                let rowHTML = `
+                    <td class="px-4 py-3 sticky-col-matrix-name text-white font-medium">
+                        <div class="flex items-center justify-between">
+                            <span class="hover:underline cursor-pointer truncate max-w-[110px]" onclick="viewIndividualReport('${emp.name}')" title="${emp.name}">${emp.name}</span>
+                            ${statusTag}
+                        </div>
+                    </td>
+                `;
                 
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const currentCellDate = `${monthValKey}-${String(d).padStart(2, '0')}`;
+                displayDates.forEach(item => {
+                    const dObj = item.date;
+                    const yStr = dObj.getFullYear();
+                    const mStr = String(dObj.getMonth() + 1).padStart(2, '0');
+                    const dStr = String(dObj.getDate()).padStart(2, '0');
+                    const currentCellDate = `${yStr}-${mStr}-${dStr}`;
+
+                    const dayOfWeek = dObj.getDay();
+                    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                    
+                    let cellBg = isWeekend ? "bg-amber-950/20 border-amber-900/30" : "";
+                    if (!item.isCurrentMonth && !isWeekend) cellBg = "bg-gray-850/40 text-gray-500";
+
                     const match = empRecords.find(r => currentCellDate >= r.startDate && currentCellDate <= r.endDate);
                     
                     let badge = "";
                     if (match) {
                         let c = "bg-amber-600 text-black";
-                        if(match.type === 'SL') c = "bg-red-600 text-white";
-                        if(match.type === 'AL') c = "bg-blue-600 text-white";
-                        if(match.type === 'CL') c = "bg-orange-600 text-white";
-                        if(match.type === 'LI') c = "bg-purple-600 text-white";
-                        if(match.type === 'LE') c = "bg-violet-600 text-white";
-                        if(match.type === 'WC') c = "bg-pink-600 text-white";
-                        badge = `<span class="${c} text-[9px] px-1.5 py-0.5 rounded font-black">${match.type}</span>`;
+                        if (match.type === 'SL') c = "bg-red-600 text-white";
+                        if (match.type === 'AL') c = "bg-blue-600 text-white";
+                        if (match.type === 'CL') c = "bg-orange-600 text-white";
+                        if (match.type === 'WC') c = "bg-pink-600 text-white";
+                        if (match.type === 'OS') c = "bg-cyan-600 text-white";
+                        if (match.type === 'LI') c = "bg-purple-600 text-white";
+                        if (match.type === 'LE') c = "bg-violet-600 text-white";
+                        const labelTitle = `${match.type}: ${getTypeLabel(match.type)} (${match.startDate} to ${match.endDate}) - ${match.notes || ''}`;
+                        badge = `<span class="${c} text-[9px] px-1.5 py-0.5 rounded font-black shadow-sm" title="${labelTitle}">${match.type}</span>`;
                     }
-                    rowHTML += `<td class="p-1 text-center border-r border-gray-700 h-10 cursor-pointer hover:bg-gray-700 transition" onclick="clickMatrixCell('${emp.name}', '${currentCellDate}')">${badge}</td>`;
-                }
+                    rowHTML += `<td class="p-1 text-center border-r border-gray-700 h-10 cursor-pointer hover:bg-gray-700 transition ${cellBg}" onclick="clickMatrixCell('${emp.name}', '${currentCellDate}')">${badge}</td>`;
+                });
                 
-                rowHTML += `<td class="px-4 py-3 sticky-col-right bg-gray-800 border-l border-gray-700 text-center font-bold text-gray-300">
+                rowHTML += `<td class="px-4 py-3 sticky-col-right text-center font-bold text-gray-300">
                     <span class="text-red-400">${stats.days}d</span> lost / <span class="${stats.score > 100 ? 'text-red-400' : 'text-emerald-400'}">${stats.score}</span>
                 </td>`;
                 
                 tr.innerHTML = rowHTML;
                 bodyRows.appendChild(tr);
             });
+        }
+
+        // BUILD SKILLS MATRIX COMPONENT (FROZEN TOP ROW & FROZEN LEFT COLUMNS)
+        function buildSkillsMatrix() {
+            const tbody = document.getElementById('skills-body-rows');
+            const tfoot = document.getElementById('skills-foot-rows');
+            tbody.innerHTML = "";
+            tfoot.innerHTML = "";
+
+            if (employeeList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${skillsColumns.length + 2}" class="p-6 text-center text-gray-500">No employees registered yet. Add one in the sidebar.</td></tr>`;
+                return;
+            }
+
+            const sortedEmployees = [...employeeList].sort((a, b) => {
+                let idxA = factoryPositions.indexOf(a.role);
+                let idxB = factoryPositions.indexOf(b.role);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                return idxA - idxB;
+            });
+
+            const colStats = {};
+            skillsColumns.forEach(machine => {
+                colStats[machine] = { experienced: 0, competent: 0, independent: 0, dependent: 0, totalTrained: 0 };
+            });
+
+            sortedEmployees.forEach(emp => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-750 border-b border-gray-700";
+
+                let rowHTML = `
+                    <td class="px-4 py-3 sticky-skills-pos text-gray-300 font-medium">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="truncate max-w-[190px] text-xs" title="${emp.role || 'Unassigned'}">${emp.role || 'Unassigned'}</span>
+                            <button onclick="openReassignModal('${emp.id}', '${emp.name}', '${emp.role || ''}')" class="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-emerald-400 transition" title="Change Position">
+                                <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 sticky-skills-name text-white font-semibold cursor-pointer hover:underline" onclick="viewIndividualReport('${emp.name}')">
+                        <span class="truncate block max-w-[150px]" title="${emp.name}">${emp.name}</span>
+                    </td>
+                `;
+
+                skillsColumns.forEach((machine, colIdx) => {
+                    const currentSkill = (emp.skills && emp.skills[machine]) ? emp.skills[machine] : "Not Trained";
+                    
+                    if (currentSkill === "Experienced") { colStats[machine].experienced++; colStats[machine].totalTrained++; }
+                    else if (currentSkill === "Competent") { colStats[machine].competent++; colStats[machine].totalTrained++; }
+                    else if (currentSkill === "Independent") { colStats[machine].independent++; colStats[machine].totalTrained++; }
+                    else if (currentSkill === "Dependent") { colStats[machine].dependent++; colStats[machine].totalTrained++; }
+
+                    let badgeClass = "text-gray-500 bg-transparent";
+                    if (currentSkill === "Dependent") badgeClass = "bg-amber-950/40 text-amber-300 border border-amber-700";
+                    if (currentSkill === "Independent") badgeClass = "bg-sky-900/40 text-sky-300 border border-sky-700";
+                    if (currentSkill === "Competent") badgeClass = "bg-emerald-900/50 text-emerald-300 border border-emerald-700 font-semibold";
+                    if (currentSkill === "Experienced") badgeClass = "bg-purple-900/60 text-purple-200 border border-purple-500 font-bold";
+
+                    rowHTML += `
+                        <td class="p-2 text-center border-r border-gray-700 h-10 cursor-pointer hover:bg-gray-700 transition" onclick="cycleSkillLevelByIndex('${emp.id}', ${colIdx})">
+                            <span class="text-[10px] px-2 py-1 rounded select-none ${badgeClass}">${currentSkill}</span>
+                        </td>
+                    `;
+                });
+
+                tr.innerHTML = rowHTML;
+                tbody.appendChild(tr);
+            });
+
+            let expRow = `
+                <tr class="bg-gray-855 border-b border-gray-700 font-bold">
+                    <td class="px-4 py-2.5 sticky-skills-pos bg-gray-855 text-white border-r border-gray-700">Experienced Count</td>
+                    <td class="px-4 py-2.5 sticky-skills-name bg-gray-855 text-gray-300 border-r border-gray-700 text-xs">Target: Min 3</td>
+            `;
+            skillsColumns.forEach(machine => {
+                const count = colStats[machine].experienced;
+                const badge = count < 3 
+                    ? `<span class="bg-red-900/80 text-red-300 border border-red-600 px-2 py-0.5 rounded text-[10px] font-black" title="SHORTFALL: <3 Experienced">${count}</span>`
+                    : `<span class="bg-purple-900/60 text-purple-200 border border-purple-500 px-2 py-0.5 rounded text-[10px]">${count}</span>`;
+                expRow += `<td class="p-2 text-center border-r border-gray-700">${badge}</td>`;
+            });
+            expRow += `</tr>`;
+
+            let compRow = `
+                <tr class="bg-gray-850 border-b border-gray-700">
+                    <td class="px-4 py-2 sticky-skills-pos bg-gray-850 text-gray-300 border-r border-gray-700 text-xs">Competent Count</td>
+                    <td class="px-4 py-2 sticky-skills-name bg-gray-850 text-gray-400 border-r border-gray-700 text-xs">Certified Solo</td>
+            `;
+            skillsColumns.forEach(machine => {
+                compRow += `<td class="p-1.5 text-center border-r border-gray-700 text-emerald-400 font-semibold text-xs">${colStats[machine].competent}</td>`;
+            });
+            compRow += `</tr>`;
+
+            let indDepRow = `
+                <tr class="bg-gray-850 border-b border-gray-700 text-gray-400">
+                    <td class="px-4 py-2 sticky-skills-pos bg-gray-850 text-gray-400 border-r border-gray-700 text-xs">Indep / Depend</td>
+                    <td class="px-4 py-2 sticky-skills-name bg-gray-850 text-gray-500 border-r border-gray-700 text-xs">In Training</td>
+            `;
+            skillsColumns.forEach(machine => {
+                indDepRow += `<td class="p-1.5 text-center border-r border-gray-700 text-xs">${colStats[machine].independent} / ${colStats[machine].dependent}</td>`;
+            });
+            indDepRow += `</tr>`;
+
+            let totRow = `
+                <tr class="bg-gray-900 font-bold">
+                    <td class="px-4 py-2.5 sticky-skills-pos bg-gray-900 text-emerald-400 border-r border-gray-700 text-xs uppercase tracking-wider">Total Coverage</td>
+                    <td class="px-4 py-2.5 sticky-skills-name bg-gray-900 text-gray-300 border-r border-gray-700 text-xs">Any Level</td>
+            `;
+            skillsColumns.forEach(machine => {
+                totRow += `<td class="p-2 text-center border-r border-gray-700 text-white font-bold text-xs">${colStats[machine].totalTrained}</td>`;
+            });
+            totRow += `</tr>`;
+
+            tfoot.innerHTML = expRow + compRow + indDepRow + totRow;
+            lucide.createIcons();
+        }
+
+        async function cycleSkillLevelByIndex(empId, colIdx) {
+            const machine = skillsColumns[colIdx];
+            const emp = employeeList.find(e => e.id === empId);
+            if (!emp) return;
+
+            const currentLevel = (emp.skills && emp.skills[machine]) ? emp.skills[machine] : "Not Trained";
+            const nextIdx = (skillLevels.indexOf(currentLevel) + 1) % skillLevels.length;
+            const newLevel = skillLevels[nextIdx];
+
+            try {
+                const updatedSkills = { ...(emp.skills || {}), [machine]: newLevel };
+                await window.firestoreUtils.updateDoc(window.firestoreUtils.doc(window.db, "employees", empId), {
+                    skills: updatedSkills
+                });
+                emp.skills = updatedSkills;
+                buildSkillsMatrix();
+            } catch (err) {
+                console.error("Failed to update skill:", err);
+            }
         }
 
         function clickMatrixCell(name, dateStr) {
@@ -533,7 +2240,7 @@
         function renderDashboard() {
             const tbody = document.getElementById('dashboard-table-body');
             tbody.innerHTML = "";
-            let sl = 0, al = 0, fn = 0;
+            let sl = 0, al = 0, os = 0, fn = 0;
 
             if (allRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-gray-400">No logs saved.</td></tr>`;
@@ -541,17 +2248,19 @@
             }
 
             allRecords.forEach(r => {
-                if (r.type === 'SL') sl++;
+                if (['SL', 'CL', 'WC'].includes(r.type)) sl++;
                 if (r.type === 'AL') al++;
+                if (r.type === 'OS') os++;
                 if (r.type === 'FN') fn++;
 
                 let col = 'bg-amber-950 text-amber-300 border-amber-900';
-                if(r.type==='SL') col='bg-red-950 text-red-400 border-red-900';
-                if(r.type==='AL') col='bg-blue-950 text-blue-400 border-red-900';
+                if(['SL', 'CL', 'WC'].includes(r.type)) col='bg-red-950 text-red-400 border-red-900';
+                if(r.type==='AL') col='bg-blue-950 text-blue-400 border-blue-900';
+                if(r.type==='OS') col='bg-cyan-950 text-cyan-300 border-cyan-900';
 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-gray-750 border-b border-gray-700 cursor-pointer";
-                row.onclick = () => viewIndividualReport(r.employeeName);
+                row.onclick = () => showEventDetails(r);
                 row.innerHTML = `
                     <td class="px-4 py-3 text-white font-medium">${r.employeeName}</td>
                     <td class="px-4 py-3"><span class="px-2 py-0.5 rounded border text-xs font-semibold ${col}">${r.type}</span></td>
@@ -563,6 +2272,7 @@
 
             document.getElementById('stat-absences').innerText = sl;
             document.getElementById('stat-leave').innerText = al;
+            document.getElementById('stat-offsite').innerText = os;
             document.getElementById('stat-notes').innerText = fn;
         }
 
@@ -594,7 +2304,7 @@
         }
 
         function calculateBradford(records) {
-            const absences = records.filter(r => r.type === 'SL' || r.type === 'CL');
+            const absences = records.filter(r => ['SL', 'CL', 'WC'].includes(r.type));
             const spells = absences.length;
             let days = 0;
             absences.forEach(r => {
@@ -608,27 +2318,44 @@
         function updateCalendarEvents() {
             if (!calendar) return;
             const events = allRecords.map(r => {
-                let c = '#ef4444'; // SL
+                let c = '#ef4444'; 
                 if(r.type==='AL') c='#3b82f6';
+                if(r.type==='CL') c='#f97316';
+                if(r.type==='WC') c='#ec4899';
+                if(r.type==='OS') c='#06b6d4'; 
+                if(r.type==='LI') c='#a855f7';
+                if(r.type==='LE') c='#8b5cf6';
                 if(r.type==='FN') c='#f59e0b';
                 
                 let endObj = new Date(r.endDate);
                 endObj.setDate(endObj.getDate() + 1);
-                return { title: `${r.employeeName} [${r.type}]`, start: r.startDate, end: endObj.toISOString().split('T')[0], color: c };
+
+                return { 
+                    title: `${r.employeeName} [${r.type}]`, 
+                    start: r.startDate, 
+                    end: endObj.toISOString().split('T')[0], 
+                    color: c,
+                    extendedProps: {
+                        id: r.id,
+                        employeeName: r.employeeName,
+                        type: r.type,
+                        startDate: r.startDate,
+                        endDate: r.endDate,
+                        notes: r.notes,
+                        auditLog: r.auditLog || []
+                    }
+                };
             });
             calendar.removeAllEvents();
             calendar.addEventSource(events);
         }
 
-        // FILTERED RUNTIME LOGIC FOR LIVE VIEW TIMELINE
         function getFilteredAndSortedRecords(name) {
-            // 1. Resolve multi select checked inputs
             const checkedTypes = Array.from(document.querySelectorAll('.filter-chk:checked')).map(el => el.value);
             const sortOrder = document.getElementById('filter-sort-order').value;
 
             let records = allRecords.filter(r => r.employeeName === name && checkedTypes.includes(r.type));
             
-            // 2. Execute array sorting transforms
             records.sort((a, b) => {
                 const dateA = new Date(a.startDate);
                 const dateB = new Date(b.startDate);
@@ -674,37 +2401,82 @@
             }
 
             targetTimelineRecords.forEach(r => {
+                const auditSnippet = (r.auditLog && r.auditLog.length > 0) 
+                    ? `<span class="text-[10px] text-amber-400 block mt-1"><i data-lucide="history" class="w-3 h-3 inline"></i> ${r.auditLog.length} revision(s) recorded</span>` 
+                    : "";
+
                 timeline.innerHTML += `
-                    <div class="p-3 bg-gray-750/40 rounded-lg border-l-4 border-emerald-500">
-                        <div class="flex justify-between text-xs"><span class="font-bold text-white">[${r.type}] Entry Log</span><span class="text-gray-400 font-semibold">${r.startDate} to ${r.endDate}</span></div>
-                        <p class="text-xs text-gray-300 mt-1">${r.notes}</p>
+                    <div class="p-3 bg-gray-750/40 rounded-lg border-l-4 border-emerald-500 flex justify-between items-start">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-xs">[${r.type}] ${getTypeLabel(r.type)}</span>
+                                <span class="text-gray-400 font-semibold text-xs">${r.startDate} to ${r.endDate}</span>
+                            </div>
+                            <p class="text-xs text-gray-300">${r.notes}</p>
+                            ${auditSnippet}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick='showEventDetails(${JSON.stringify(r)})' class="p-1.5 bg-gray-700 hover:bg-gray-655 text-gray-300 rounded text-xs font-semibold flex items-center gap-1" title="View, edit or inspect history">
+                                <i data-lucide="settings" class="w-3.5 h-3.5"></i> Manage
+                            </button>
+                        </div>
                     </div>`;
             });
+            lucide.createIcons();
         }
 
         function switchTab(viewId) {
             document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('manning-view').classList.add('hidden');
             document.getElementById('matrix-view').classList.add('hidden');
             document.getElementById('calendar-view').classList.add('hidden');
+            document.getElementById('skills-view').classList.add('hidden');
             document.getElementById('roster-view').classList.add('hidden');
             document.getElementById('individual-view').classList.add('hidden');
 
-            document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
-            document.getElementById('btn-matrix').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
-            document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
-            document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
+            const btnIds = ['btn-dashboard', 'btn-manning', 'btn-matrix', 'btn-calendar', 'btn-skills', 'btn-roster'];
+            btnIds.forEach(id => {
+                const btn = document.getElementById(id);
+                if(btn) btn.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition";
+            });
 
-            if (viewId === 'dashboard') { document.getElementById('dashboard-view').classList.remove('hidden'); document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; }
-            if (viewId === 'matrix') { document.getElementById('matrix-view').classList.remove('hidden'); document.getElementById('btn-matrix').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; buildMatrixGrid(); }
-            if (viewId === 'calendar') { document.getElementById('calendar-view').classList.remove('hidden'); document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; setTimeout(() => { calendar.updateSize(); }, 50); }
-            if (viewId === 'roster') { document.getElementById('roster-view').classList.remove('hidden'); document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; }
-            if (viewId === 'individual') { document.getElementById('individual-view').classList.remove('hidden'); }
+            if (viewId === 'dashboard') { 
+                document.getElementById('dashboard-view').classList.remove('hidden'); 
+                document.getElementById('btn-dashboard').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+            }
+            if (viewId === 'manning') { 
+                document.getElementById('manning-view').classList.remove('hidden'); 
+                document.getElementById('btn-manning').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+                loadManningPlanForDate(manningDateStr);
+            }
+            if (viewId === 'matrix') { 
+                document.getElementById('matrix-view').classList.remove('hidden'); 
+                document.getElementById('btn-matrix').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+                buildMatrixGrid(); 
+            }
+            if (viewId === 'calendar') { 
+                document.getElementById('calendar-view').classList.remove('hidden'); 
+                document.getElementById('btn-calendar').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+                setTimeout(() => { calendar.updateSize(); }, 50); 
+            }
+            if (viewId === 'skills') { 
+                document.getElementById('skills-view').classList.remove('hidden'); 
+                document.getElementById('btn-skills').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+                buildSkillsMatrix(); 
+            }
+            if (viewId === 'roster') { 
+                document.getElementById('roster-view').classList.remove('hidden'); 
+                document.getElementById('btn-roster').className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-medium transition"; 
+            }
+            if (viewId === 'individual') { 
+                document.getElementById('individual-view').classList.remove('hidden'); 
+            }
+            lucide.createIcons();
         }
 
-        // Export Engines integrating dynamic states
         function exportToExcel() {
             const activeDataset = getFilteredAndSortedRecords(selectedEmployee);
-            const data = activeDataset.map(r => ({ Employee: r.employeeName, TypeCode: r.type, Start: r.startDate, End: r.endDate, ContextNotes: r.notes }));
+            const data = activeDataset.map(r => ({ Employee: r.employeeName, TypeCode: r.type, Type: getTypeLabel(r.type), Start: r.startDate, End: r.endDate, Notes: r.notes }));
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered Logs");
@@ -723,19 +2495,13 @@
             let y = 35;
             activeDataset.forEach((r, idx) => {
                 if(y > 270) { doc.addPage(); y = 20; }
-                doc.text(`${idx+1}. [${r.type}] ${r.startDate} to ${r.endDate} - Notes: ${r.notes}`, 14, y);
+                doc.text(`${idx+1}. [${r.type} - ${getTypeLabel(r.type)}] ${r.startDate} to ${r.endDate} - Notes: ${r.notes}`, 14, y);
                 y += 12;
             });
             doc.save(`${selectedEmployee.replace(/\s+/g, '_')}_Filtered_Report.pdf`);
         }
 
-        function toggleTheme() { return false; }
-        function updateThemeIcon(theme) {
-            const iconBtn = document.getElementById('theme-icon');
-            if (iconBtn) iconBtn.setAttribute('data-lucide', 'sun');
-            lucide.createIcons();
-        }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); lucide.createIcons(); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     </script>
 </body>
